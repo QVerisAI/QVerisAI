@@ -318,11 +318,9 @@ Qveris 使用统一的 JSON Schema 来描述所有工具。
 
 ```json
 {
-  "tool": "web.search",
-  "input": {
-    "query": "AI agent",
-    "limit": 5
-  }
+  "tool_id": "openweathermap_current_weather",
+  "search_id": "2f06d73c-164c-4a20-82a4-20f1afdd49f8",
+  "params_to_tool": "{\"city\": \"London\", \"units\": \"metric\"}"
 }
 ```
 
@@ -330,12 +328,17 @@ Qveris 使用统一的 JSON Schema 来描述所有工具。
 
 ```json
 {
-  "status": "ok",
-  "data": [...],
-  "meta": {
-    "provider": "google",
-    "latency_ms": 451
-  }
+  "execution_id": "exec-123",
+  "tool_id": "openweathermap_current_weather",
+  "success": true,
+  "result": {
+    "data": {
+      "temperature": 15.5,
+      "humidity": 72,
+      "description": "partly cloudy"
+    }
+  },
+  "execution_time": 0.447
 }
 ```
 
