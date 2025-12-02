@@ -324,11 +324,9 @@ Qveris standardizes every tool with a simple JSON schema.
 
 ```json
 {
-  "tool": "web.search",
-  "input": {
-    "query": "AI agents",
-    "limit": 5
-  }
+  "tool_id": "openweathermap_current_weather",
+  "search_id": "2f06d73c-164c-4a20-82a4-20f1afdd49f8",
+  "params_to_tool": "{\"city\": \"London\", \"units\": \"metric\"}"
 }
 ```
 
@@ -336,18 +334,17 @@ Qveris standardizes every tool with a simple JSON schema.
 
 ```json
 {
-  "status": "ok",
-  "data": [
-    {
-      "title": "AI agents in production",
-      "url": "https://example.com/...",
-      "snippet": "..."
+  "execution_id": "exec-123",
+  "tool_id": "openweathermap_current_weather",
+  "success": true,
+  "result": {
+    "data": {
+      "temperature": 15.5,
+      "humidity": 72,
+      "description": "partly cloudy"
     }
-  ],
-  "meta": {
-    "provider": "provider-id",
-    "latency_ms": 412
-  }
+  },
+  "execution_time": 0.447
 }
 ```
 
