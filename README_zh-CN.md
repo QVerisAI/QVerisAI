@@ -5,7 +5,7 @@
   <h1>Qveris — AI Agent 的工具操作系统（Tool OS）</h1>
 
 
-  <p><strong>一个统一接口，让 AI 访问超过 10,000+ 个工具。</strong></p>
+  <p><strong>一个统一接口，让你的 AI 使用超过 10,000+ 个工具。</strong></p>
   <p>
   官方网站：<a href="https://qveris.ai" target="_blank"><b>https://qveris.ai</b></a>
   </p>
