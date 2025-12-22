@@ -106,7 +106,7 @@ class QverisClient:
         parameters: Dict[str, Any],
         search_id: Optional[str] = None,
         session_id: Optional[str] = None,
-        max_data_size: Optional[int] = None
+        max_response_size: Optional[int] = None
     ) -> ToolExecutionResponse:
         """
         Execute a specific tool.
@@ -116,7 +116,7 @@ class QverisClient:
             parameters: JSON-serializable parameters for the tool.
             search_id: Search id returned by `search_tools(...)` (recommended for traceability).
             session_id: Optional correlation id.
-            max_data_size: Optional max response size in bytes. Large responses may be truncated.
+            max_response_size: Optional max response size in bytes. Large responses may be truncated.
 
         Returns:
             `ToolExecutionResponse` with `success`, `result`, and metadata.
@@ -132,8 +132,8 @@ class QverisClient:
         if session_id:
             payload["session_id"] = session_id
 
-        if max_data_size:
-            payload["max_data_size"] = max_data_size
+        if max_response_size:
+            payload["max_response_size"] = max_response_size
 
         self._debug(f"[Qveris API] POST {url}")
         self._debug(f"[Qveris API] Request body: {json.dumps(payload, indent=2)}")
@@ -202,7 +202,7 @@ class QverisClient:
                     parameters=params,
                     search_id=func_args.get("search_id"),
                     session_id=session_id,
-                    max_data_size=func_args.get("max_data_size")
+                    max_response_size=func_args.get("max_response_size")
                 )
                 return result.model_dump(), False, True
                 

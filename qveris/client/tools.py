@@ -82,7 +82,7 @@ EXECUTE_TOOL_DEF: ChatCompletionToolParam = {
                     "type": "string",
                     "description": "A JSON stringified dictionary of parameters to pass to the tool."
                 },
-                "max_data_size": {
+                "max_response_size": {
                     "type": "integer",
                     "description": "Max data size in bytes (default 20480)"
                 }

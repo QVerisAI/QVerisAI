@@ -30,7 +30,7 @@ When emitting a tool call, providers should surface a dict shaped like:
 Where `arguments` is a JSON-encoded string. For Qveris built-ins:
 
 - `search_tools` expects `{"query": "...", "limit": 10}` (limit optional)
-- `execute_tool` expects `{"tool_id": "...", "search_id": "...", "params_to_tool": "<json-string>", "max_data_size": 20480}`
+- `execute_tool` expects `{"tool_id": "...", "search_id": "...", "params_to_tool": "<json-string>", "max_response_size": 20480}`
 
 ## Event types
 
