@@ -165,10 +165,10 @@ console.log(data.results?.[0]?.tool_id);
 curl -sS -X POST "https://qveris.ai/api/v1/tools/execute?tool_id=openweathermap_current_weather" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d "{\"search_id\":\"YOUR_SEARCH_ID\",\"parameters\":{\"city\":\"London\",\"units\":\"metric\"},\"max_data_size\":20480}"
+  -d "{\"search_id\":\"YOUR_SEARCH_ID\",\"parameters\":{\"city\":\"London\",\"units\":\"metric\"},\"max_response_size\":20480}"
 ```
 
-If tool output exceeds `max_data_size`, the response includes `truncated_content` plus a temporary `full_content_file_url`.
+If tool output exceeds `max_response_size`, the response includes `truncated_content` plus a temporary `full_content_file_url`.
 
 **Python**
 
@@ -190,7 +190,7 @@ resp = requests.post(
     json={
         "search_id": search_id,
         "parameters": {"city": "London", "units": "metric"},
-        "max_data_size": 20480,
+        "max_response_size": 20480,
     },
     timeout=60,
 )
@@ -217,7 +217,7 @@ const resp = await fetch(
     body: JSON.stringify({
       search_id: searchId,
       parameters: { city: "London", units: "metric" },
-      max_data_size: 20480,
+      max_response_size: 20480,
     }),
   }
 );
