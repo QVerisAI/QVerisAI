@@ -29,7 +29,7 @@ If your client supports **Model Context Protocol (MCP)**, you can add the offici
   "mcpServers": {
     "qveris": {
       "command": "npx",
-      "args": ["@qverisai/sdk"],
+      "args": ["@qverisai/mcp"],
       "env": {
         "QVERIS_API_KEY": "your-api-key-here"
       }
