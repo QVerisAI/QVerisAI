@@ -244,7 +244,24 @@ After configuration, restart Claude Code. You can verify the setup by:
 3. **Test tool discovery**: Ask Claude to search for tools using Qveris in a chat session
 4. **Verify skills**: Check that skills are being applied in responses
 
-## 6. Troubleshooting
+## 6. Start Using
+
+Once you've configured, you can use it in Claude Code by referencing it with `@.claude\skills\qveris\` (Windows) or `@.claude/skills/qveris/` (Mac/Linux).
+
+**Example:**
+
+> Write a python script that prints the current bitcoin price using @.claude/skills/qveris/
+
+**Result:**
+
+```bash
+$ python bitcoin_price.py
+Fetching current Bitcoin price...
+
+💰 Current Bitcoin Price: $89,901.00 USD
+```
+
+## 7. Troubleshooting
 
 ### MCP Server Not Connecting
 
