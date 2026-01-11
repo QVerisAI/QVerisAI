@@ -23,12 +23,12 @@ Use Claude CLI to configure MCP servers at the user level. The recommended appro
 
 **Mac:**
 ```bash
-claude mcp add --transport stdio --scope user --env QVERIS_API_KEY=your-api-key-here qveris -- npx -y @qverisai/mcp
+claude mcp add qveris --transport stdio --scope user --env QVERIS_API_KEY=your-api-key-here -- npx -y @qverisai/mcp
 ```
 
 **Windows (Command Prompt):**
 ```cmd
-claude mcp add --transport stdio --scope user --env QVERIS_API_KEY=your-api-key-here qveris -- cmd /c npx -y @qverisai/mcp
+claude mcp add qveris --transport stdio --scope user --env QVERIS_API_KEY=your-api-key-here -- cmd /c npx -y @qverisai/mcp
 ```
 
 **Important Notes:**
@@ -294,4 +294,5 @@ npx -y @qverisai/mcp
 If you encounter path issues:
 - Use forward slashes `/` or escaped backslashes `\\` in JSON
 - Avoid spaces in directory names if possible
+
 - Use quotes around paths with spaces in command line
