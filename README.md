@@ -1,8 +1,8 @@
 
 <div align="center">
-  <img src="logo.png" width="120" alt="Qveris Logo" />
+  <img src="logo.png" width="120" alt="QVeris Logo" />
 
-  <h1>Qveris — The Tool OS for AI Agents</h1>
+  <h1>QVeris — The Tool OS for AI Agents</h1>
 
   <p><strong>One unified interface to use 10,000+ tools for your AI agents.</strong></p>
   <p>
@@ -17,17 +17,17 @@
 
   <p>
     <!-- Badges: update URLs/branches as needed -->
-    <a href="https://github.com/QverisAI/QverisAI">
-      <img src="https://img.shields.io/github/stars/QverisAI/QverisAI?style=social" alt="GitHub stars" />
+    <a href="https://github.com/QVerisAI/QVerisAI">
+      <img src="https://img.shields.io/github/stars/QVerisAI/QVerisAI?style=social" alt="GitHub stars" />
     </a>
     <a href="https://www.npmjs.com/package/@qverisai/mcp">
       <img src="https://img.shields.io/npm/v/@qverisai/mcp?label=@qverisai/mcp" alt="npm version" />
     </a>
-    <a href="https://github.com/QverisAI/QverisAI/actions">
-      <img src="https://img.shields.io/github/actions/workflow/status/QverisAI/QverisAI/ci.yml?label=build" alt="build status" />
+    <a href="https://github.com/QVerisAI/QVerisAI/actions">
+      <img src="https://img.shields.io/github/actions/workflow/status/QVerisAI/QVerisAI/ci.yml?label=build" alt="build status" />
     </a>
-    <a href="https://github.com/QverisAI/QverisAI/blob/main/LICENSE">
-      <img src="https://img.shields.io/github/license/QverisAI/QverisAI" alt="license" />
+    <a href="https://github.com/QVerisAI/QVerisAI/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/QVerisAI/QVerisAI" alt="license" />
     </a>
   </p>
 </div>
@@ -38,8 +38,8 @@
 
 1. [Overview](#-overview)  
 2. [Vision & Positioning](#-vision--positioning)  
-3. [Why Qveris](#-why-qveris)  
-4. [Problems Qveris Solves](#-problems-qveris-solves)  
+3. [Why QVeris](#-why-qveris)  
+4. [Problems QVeris Solves](#-problems-qveris-solves)  
 5. [Architecture](#-architecture)  
 6. [Execution Flow](#-execution-flow)  
 7. [Quickstart](#-quickstart)  
@@ -60,15 +60,15 @@
 
 ## 🌐 Overview
 
-Qveris is the **Tool Operating System (Tool OS)** for AI agents.  
+QVeris is the **Tool Operating System (Tool OS)** for AI agents.  
 It standardizes how LLMs discover and call **10,000+ tools** — web search, OCR, PDF parsing, SaaS APIs, internal services, and business actions — through a **single schema**, a **secure sandbox**, and a **routing engine** that selects the best provider. 
 
-> If LLMs are the brain, Qveris is the hands: safe, reliable, and repeatable.
+> If LLMs are the brain, QVeris is the hands: safe, reliable, and repeatable.
 
 At a glance:
 
 ```text
-User → LLM / Agent → Qveris Tool OS → 10,000+ tools / APIs / systems
+User → LLM / Agent → QVeris Tool OS → 10,000+ tools / APIs / systems
 ````
 
 ---
@@ -76,23 +76,23 @@ User → LLM / Agent → Qveris Tool OS → 10,000+ tools / APIs / systems
 ## 🎯 Vision & Positioning
 
 **Vision**
-Become the global infrastructure layer for AI actions — every agent, model, and AI app executes tools through Qveris.
+Become the global infrastructure layer for AI actions — every agent, model, and AI app executes tools through QVeris.
 
 **Positioning**
 
 * Not another agent framework.
 * Not just “plugins”.
-* Qveris is the **shared tool layer** underneath agents, LLMs, and SaaS products.
+* QVeris is the **shared tool layer** underneath agents, LLMs, and SaaS products.
 
 > Think **Kubernetes + Zapier + Homebrew**, but for tools in AI agent ecosystems.
 
 ---
 
-## 💡 Why Qveris
+## 💡 Why QVeris
 
 ### The reality for teams building tool-using agents
 
-| Layer       | Today (without Qveris)                    | With Qveris                                       |
+| Layer       | Today (without QVeris)                    | With QVeris                                       |
 | ----------- | ----------------------------------------- | ------------------------------------------------- |
 | Tool schema | Different JSON formats per provider/model | One universal schema                              |
 | Integration | Custom wrappers, retries, logging, auth   | Managed integration via Tool OS & SDKs            |
@@ -101,12 +101,12 @@ Become the global infrastructure layer for AI actions — every agent, model, an
 | Governance  | Ad-hoc logs and permissions               | Central policies, RBAC & full audit logs          |
 | Ecosystem   | Only your own tools                       | **10,000+** tools via built-ins, partners & users |
 
-Without Qveris you rebuild the same infrastructure again and again.
-With Qveris you plug into a **tool fabric** that is ready for agents.
+Without QVeris you rebuild the same infrastructure again and again.
+With QVeris you plug into a **tool fabric** that is ready for agents.
 
 ---
 
-## 🆘 Problems Qveris Solves
+## 🆘 Problems QVeris Solves
 
 ### 1. Fragmented tool ecosystem
 
@@ -116,7 +116,7 @@ OpenAI tools   ≠   LangChain tools   ≠   Zhipu tools   ≠   internal APIs
 
 Each has its own format, auth, and error semantics.
 
-Qveris normalizes everything into a **single Tool OS**.
+QVeris normalizes everything into a **single Tool OS**.
 
 ---
 
@@ -129,7 +129,7 @@ Teams repeatedly build:
 * Logging, tracing, metrics
 * Permissions & policy enforcement
 
-Qveris centralizes this logic and exposes it through one interface.
+QVeris centralizes this logic and exposes it through one interface.
 
 ---
 
@@ -141,7 +141,7 @@ Without a dedicated tool layer:
 * No clear boundary for what a model is allowed to do
 * Hard to answer “what exactly did the agent execute?”
 
-Qveris provides:
+QVeris provides:
 
 * Sandbox & firewall
 * Access policies & RBAC
@@ -160,7 +160,7 @@ Qveris provides:
                                    Tool calls (JSON)
                                          |
      +-----------------------------------v----------------------------------+
-     |                          Qveris Tool OS                             |
+     |                          QVeris Tool OS                             |
      |---------------------------------------------------------------------|
      |  Tool Registry  |  Schema   |   Sandbox   | Routing  | Logs & ACLs  |
      +---------+-------+-----------+-------------+----------+-------------+
@@ -204,7 +204,7 @@ flowchart TB
   %% --- 2. Node Definitions ---
   U(["👤 User"])
   L["LLM / Agent"]
-  Q["⚡ Qveris Tool OS"]
+  Q["⚡ QVeris Tool OS"]
 
   %% --- 3. Bottom Tool Layer (Forced Grouping) ---
   subgraph ToolLayer ["▼ Tool Ecosystem (10,000+)"]
@@ -236,9 +236,9 @@ flowchart TB
 
 ```
 
-> Behind a single `tool_call`, Qveris can discover, select and execute from **10,000+ tools** across core, partner and user-defined catalogs.
+> Behind a single `tool_call`, QVeris can discover, select and execute from **10,000+ tools** across core, partner and user-defined catalogs.
 
-### 2. Inside Qveris
+### 2. Inside QVeris
 
 ```text
 1. Validate tool call against schema
@@ -253,8 +253,8 @@ flowchart TB
 
 ## ⚡ Quickstart
 
-The fastest way to use Qveris today is via the **MCP Server SDK** (`@qverisai/mcp`).
-It exposes Qveris tools to any MCP-compatible client (Claude Desktop, Cursor, etc).
+The fastest way to use QVeris today is via the **MCP Server** (`@qverisai/mcp`).
+It exposes QVeris tools to any MCP-compatible client (Claude Desktop, Cursor, etc).
 
 ### 1. Install & run the MCP server
 
@@ -318,7 +318,7 @@ Once connected, your AI assistant can:
 
 ## 🧩 Tool Schema & Execution Model
 
-Qveris standardizes every tool with a simple JSON schema.
+QVeris standardizes every tool with a simple JSON schema.
 
 ### Request
 
@@ -358,7 +358,7 @@ All tools follow:
 
 ## 🧰 Built-in & Ecosystem Tools
 
-Qveris provides access to **10,000+ tools** via a layered ecosystem:
+QVeris provides access to **10,000+ tools** via a layered ecosystem:
 
 ### Ecosystem at a glance
 
@@ -373,7 +373,7 @@ Qveris provides access to **10,000+ tools** via a layered ecosystem:
 
 | Layer                | Description                                              |
 | -------------------- | -------------------------------------------------------- |
-| Core built-in tools  | High-quality, curated tools maintained by Qveris         |
+| Core built-in tools  | High-quality, curated tools maintained by QVeris         |
 | Partner / SaaS tools | Connectors to external APIs and SaaS platforms           |
 | Custom / enterprise  | Tools published by users & companies for their own use   |
 | Marketplace tools    | Public tools discoverable and reusable by all developers |
@@ -395,7 +395,7 @@ Qveris provides access to **10,000+ tools** via a layered ecosystem:
 
 ## 🧩 Publish Your Own Tools
 
-Qveris is not a closed catalog. Any developer or company can **wrap their own APIs as Q-Tools** and plug them into the Tool OS.
+QVeris is not a closed catalog. Any developer or company can **wrap their own APIs as Q-Tools** and plug them into the Tool OS.
 
 We support three visibility levels:
 
@@ -403,17 +403,17 @@ We support three visibility levels:
 | ---------- | --------------------------------------- |
 | `private`  | Only you                                |
 | `org`      | Your team / company (private registry)  |
-| `public`   | Listed on the global Qveris Marketplace |
+| `public`   | Listed on the global QVeris Marketplace |
 
 Typical publishing flow:
 
 ```text
-1. Implement your tool using the Qveris schema
+1. Implement your tool using the QVeris schema
 2. Run `qveris-cli validate` locally
-3. Submit the tool manifest to Qveris
+3. Submit the tool manifest to QVeris
 4. Choose visibility: private / org / public
 5. (Optional) Security & quality review
-6. Tool becomes discoverable & executable via Qveris
+6. Tool becomes discoverable & executable via QVeris
 ```
 
 Example manifest (simplified):
@@ -438,13 +438,13 @@ Once published, your tool is:
 
 * discoverable via natural language (`search_tools`)
 * executable via `execute_tool`
-* fully covered by Qveris sandboxing, routing and logging.
+* fully covered by QVeris sandboxing, routing and logging.
 
 ---
 
 ## 🧠 Routing & Optimization
 
-Qveris optimizes each call across multiple providers and implementations.
+QVeris optimizes each call across multiple providers and implementations.
 
 ### What we optimize for
 
@@ -482,9 +482,9 @@ As the ecosystem grows, the routing engine scales horizontally — selecting the
 | ------------- | -------------------------------------- |
 | LLM           | OpenAI, Anthropic, Zhipu, Groq, Llama  |
 | Agent runtime | LangChain, LlamaIndex, AutoGen, CrewAI |
-| Tool layer    | **Qveris Tool OS**                     |
+| Tool layer    | **QVeris Tool OS**                     |
 
-Use Qveris as the **tool backend**: your agents simply call Qveris tools via MCP today and via HTTP/SDKs in the future.
+Use QVeris as the **tool backend**: your agents simply call QVeris tools via MCP today and via HTTP/SDKs in the future.
 
 ### Integrations (examples)
 
@@ -512,7 +512,7 @@ Because of the unified schema, adding a new provider is primarily defining a new
 * CRM bots enriching leads and updating Salesforce / HubSpot.
 * Ops bots reconciling data across internal systems.
 
-Qveris provides the guardrails, sandboxing and observability.
+QVeris provides the guardrails, sandboxing and observability.
 
 ---
 
@@ -531,13 +531,13 @@ Qveris provides the guardrails, sandboxing and observability.
 
 ### Marketplace
 
-The Qveris Marketplace (in development) allows:
+The QVeris Marketplace (in development) allows:
 
 * Providers to publish tools
 * Developers to monetize capabilities
 * Agent builders to discover & plug in tools instantly
 
-Qveris manages billing, execution sandboxing, analytics and abuse control.
+QVeris manages billing, execution sandboxing, analytics and abuse control.
 
 ### Pricing (subject to change)
 
@@ -553,7 +553,7 @@ Qveris manages billing, execution sandboxing, analytics and abuse control.
 
 ## 🔐 Security & Governance
 
-Security and governance are first-class concerns in Qveris:
+Security and governance are first-class concerns in QVeris:
 
 * Sandboxed execution environments
 * Network & resource-level policies
@@ -572,9 +572,9 @@ Compliance roadmap:
 
 ## ⚔ Comparison
 
-### Qveris vs other approaches
+### QVeris vs other approaches
 
-| Capability             | Qveris | OpenAI tools | LangChain tools   | Zapier / Make    | Single-provider tools |
+| Capability             | QVeris | OpenAI tools | LangChain tools   | Zapier / Make    | Single-provider tools |
 | ---------------------- | ------ | ------------ | ----------------- | ---------------- | --------------------- |
 | Unified tool schema    | ✅      | ❌ per-model  | ❌ per-integration | ❌ workflow-based | ❌                     |
 | LLM-agnostic           | ✅      | ❌            | ✅                 | ❌                | ⚠️ often              |
@@ -583,7 +583,7 @@ Compliance roadmap:
 | Marketplace            | ✅      | ❌            | ⚠️ community      | ✅                | ❌                     |
 | Enterprise governance  | ✅      | ⚠️ basic     | ❌                 | ⚠️ limited       | ❌                     |
 
-Qveris focuses specifically on **tool unification + routing + governance + ecosystem**, complementing (not replacing) your existing LLM and agent stack.
+QVeris focuses specifically on **tool unification + routing + governance + ecosystem**, complementing (not replacing) your existing LLM and agent stack.
 
 ---
 
@@ -649,7 +649,7 @@ Stay in touch and follow updates:
   * `https://discord.gg/your-qveris-code`
 * 🐦 **X (Twitter)** — product updates & roadmap
 
-  * `https://x.com/QverisAI`
+  * `https://x.com/QVerisAI`
 * 💼 **LinkedIn** — company & enterprise news
 
   * `https://www.linkedin.com/company/qveris`
@@ -658,7 +658,7 @@ Stay in touch and follow updates:
   * `https://docs.qveris.ai`
 * 🧪 **SDK Repository** — MCP server & examples
 
-  * `https://github.com/QverisAI/SDK`
+  * `https://github.com/QVerisAI/SDK`
 
 > Replace the placeholder URLs with your actual links when ready.
 
@@ -670,7 +670,7 @@ If you believe the world needs a better way for AI to use tools,
 please **star this repo** and share it with other builders.
 
 ```bash
-git clone https://github.com/QverisAI/QverisAI.git
-cd QverisAI
+git clone https://github.com/QVerisAI/QVerisAI.git
+cd QVerisAI
 # start building with the Tool OS
 ```

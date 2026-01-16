@@ -6,7 +6,7 @@ This guide explains how to configure Skills and MCP servers in Claude Code for b
 
 - Node.js installed (for running MCP servers)
 - Claude Code installed
-- Qveris API key (get one from [https://qveris.ai](https://qveris.ai))
+- QVeris API key (get one from [https://qveris.ai](https://qveris.ai))
 
 ## Configuration Levels
 
@@ -19,7 +19,7 @@ This guide explains how to configure Skills and MCP servers in Claude Code for b
 
 Use Claude CLI to configure MCP servers at the user level. The recommended approach is using the CLI command.
 
-**For Qveris (stdio server with npx):**
+**For QVeris (stdio server with npx):**
 
 **Mac:**
 ```bash
@@ -35,7 +35,7 @@ claude mcp add qveris --transport stdio --scope user --env QVERIS_API_KEY=your-a
 - All options (`--transport`, `--env`, `--scope`) must come **before** the server name
 - The `--` (double dash) separates the server name from the command and arguments
 - On Windows, stdio servers using `npx` require the `cmd /c` wrapper to ensure proper execution
-- Replace `your-api-key-here` with your actual Qveris API key
+- Replace `your-api-key-here` with your actual QVeris API key
 
 **Managing MCP Servers:**
 
@@ -82,15 +82,15 @@ User-level skills are stored in your home directory and are available to all pro
    
    **Mac:**
    ```bash
-   mkdir -p ~/.claude/skills && cp -R /path/to/QverisAI/skills/* ~/.claude/skills/
+   mkdir -p ~/.claude/skills && cp -R /path/to/QVerisAI/skills/* ~/.claude/skills/
    ```
    
    **Windows (Command Prompt):**
    ```cmd
-   xcopy /E /I /Y "C:\path\to\QverisAI\skills\*" "%USERPROFILE%\.claude\skills\"
+   xcopy /E /I /Y "C:\path\to\QVerisAI\skills\*" "%USERPROFILE%\.claude\skills\"
    ```
    
-   Replace `/path/to/QverisAI` (Mac) or `C:\path\to\QverisAI` (Windows) with the actual path to this repository.
+   Replace `/path/to/QVerisAI` (Mac) or `C:\path\to\QVerisAI` (Windows) with the actual path to this repository.
 
 2. **Verify the structure**:
    
@@ -181,7 +181,7 @@ Supported syntax:
 
 **Important:**
 - Project-level MCP configuration (`.mcp.json`) takes precedence over user-level configuration
-- Replace `"your-api-key-here"` with your actual Qveris API key
+- Replace `"your-api-key-here"` with your actual QVeris API key
 - You can use environment variables or a `.env` file for sensitive keys
 - Restart Claude Code after making changes
 - For security, Claude Code requires approval before using project-level MCP servers
@@ -214,15 +214,15 @@ my-project/
    
    **Mac:**
    ```bash
-   mkdir -p .claude/skills && cp -R /path/to/QverisAI/skills/* .claude/skills/
+   mkdir -p .claude/skills && cp -R /path/to/QVerisAI/skills/* .claude/skills/
    ```
    
    **Windows (Command Prompt):**
    ```cmd
-   xcopy /E /I /Y "C:\path\to\QverisAI\skills\*" ".claude\skills\"
+   xcopy /E /I /Y "C:\path\to\QVerisAI\skills\*" ".claude\skills\"
    ```
    
-   Replace `/path/to/QverisAI` (Mac) or `C:\path\to\QverisAI` (Windows) with the actual path to this repository.
+   Replace `/path/to/QVerisAI` (Mac) or `C:\path\to\QVerisAI` (Windows) with the actual path to this repository.
 
 2. **Verify the structure**:
    
@@ -241,7 +241,7 @@ After configuration, restart Claude Code. You can verify the setup by:
 
 1. **Check MCP servers**: Use `/mcp` command in Claude Code to see connected servers
 2. **List servers via CLI**: Run `claude mcp list` to see all configured servers
-3. **Test tool discovery**: Ask Claude to search for tools using Qveris in a chat session
+3. **Test tool discovery**: Ask Claude to search for tools using QVeris in a chat session
 4. **Verify skills**: Check that skills are being applied in responses
 
 ## 6. Start Using

@@ -1,4 +1,4 @@
-# Qveris API Documentation
+# QVeris API Documentation
 
 Version: 0.1.9  
 
@@ -315,7 +315,7 @@ Each tool parameter follows this schema:
 
 ## LLM/Agent Use Examples
 
-For LLM/agent tool use scenario, below are example code snippets to encapsulate Qveris AI REST API calls into tools that can be invoked by large language models:
+For LLM/agent tool use scenario, below are example code snippets to encapsulate QVeris AI REST API calls into tools that can be invoked by large language models:
 
 ```typescript
 export async function searchTools(

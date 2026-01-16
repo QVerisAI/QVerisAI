@@ -1,23 +1,23 @@
-# Qveris Documentation
+# QVeris Documentation
 
-## What is Qveris
+## What is QVeris
 
-**Qveris** is a **tool search + tool execution** layer for LLM agents. It lets your agent:
+**QVeris** is a **tool search + tool execution** layer for LLM agents. It lets your agent:
 
 - **Search** for live tools (APIs, data sources, automations) using natural language.
 - **Execute** any discovered tool by passing the required parameters.
 
-Qveris works well in agent loops (tool discovery → tool execution → feed results back to the model) and supports multiple integration styles.
+QVeris works well in agent loops (tool discovery → tool execution → feed results back to the model) and supports multiple integration styles.
 
 ---
 
 ## Quick start
 
-There are three ways to use Qveris.
+There are three ways to use QVeris.
 
-### Use Qveris MCP anywhere MCP is supported
+### Use QVeris MCP anywhere MCP is supported
 
-If your client supports **Model Context Protocol (MCP)**, you can add the official Qveris MCP server and immediately get:
+If your client supports **Model Context Protocol (MCP)**, you can add the official QVeris MCP server and immediately get:
 
 - `search_tools`
 - `execute_tool`
@@ -50,9 +50,9 @@ The assistant will:
 
 ---
 
-### Use the Qveris Python SDK
+### Use the QVeris Python SDK
 
-Get it from [github](https://github.com/QverisAI/sdk-python) and install:
+Get it from [github](https://github.com/QVerisAI/sdk-python) and install:
 
 ```bash
 pip install qveris
@@ -60,7 +60,7 @@ pip install qveris
 
 Set environment variables:
 
-- `QVERIS_API_KEY` (from [Qveris](https://qveris.ai))
+- `QVERIS_API_KEY` (from [QVeris](https://qveris.ai))
 - `OPENAI_API_KEY` (or your OpenAI-compatible provider key)
 - `OPENAI_BASE_URL` (optional; for OpenAI-compatible providers)
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
 ---
 
-### Directly call the Qveris REST API
+### Directly call the QVeris REST API
 
 **Base URL**
 
@@ -231,7 +231,7 @@ console.log(data);
 
 ### How to get an API key
 
-1. Go to [Qveris](https://qveris.ai)
+1. Go to [QVeris](https://qveris.ai)
 2. Sign in / create an account
 3. Create an API key
 4. Use it as:
@@ -242,7 +242,7 @@ console.log(data);
 
 ### Recommended system prompt
 
-Use this (copy/paste) in your assistant’s system prompt when enabling Qveris tools:
+Use this (copy/paste) in your assistant’s system prompt when enabling QVeris tools:
 
 ```text
 You are a helpful assistant that can dynamically search and execute tools to help the user. First think about what kind of tools might be useful to accomplish the user's task. Then use the search_tools tool with query describing the capability of the tool, not what params you want to pass to the tool later. Then call suitable searched tool(s) using the execute_tool tool, passing parameters to the searched tool through params_to_tool. If tool has weighted_success_rate and avg_execution_time (in seconds), consider them when selecting which tool to call. You could reference the examples given if any for each tool. You could call make multiple tool calls in a single response.
