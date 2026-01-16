@@ -44,21 +44,21 @@ If you already have an `opencode.json` file, merge the `mcp.qveris` section into
 
 ## 2. Skills Configuration
 
-Copy the QVeris skill to your global config:
+Download the QVeris skill from the GitHub repository:
+
+**Repository:** https://github.com/QVerisAI/QVerisAI/tree/main/skills
 
 **Mac/Linux:**
 ```bash
-mkdir -p ~/.config/opencode/skill
-cp -R /path/to/QverisAI/skills/qveris ~/.config/opencode/skill/
+mkdir -p ~/.config/opencode/skill/qveris
+curl -sL https://raw.githubusercontent.com/QVerisAI/QVerisAI/main/skills/qveris/SKILL.md -o ~/.config/opencode/skill/qveris/SKILL.md
 ```
 
-**Windows (Command Prompt):**
-```cmd
-mkdir "%USERPROFILE%\.config\opencode\skill"
-xcopy /E /I /Y "C:\path\to\QverisAI\skills\qveris" "%USERPROFILE%\.config\opencode\skill\qveris\"
+**Windows (PowerShell):**
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.config\opencode\skill\qveris"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/QVerisAI/QVerisAI/main/skills/qveris/SKILL.md" -OutFile "$env:USERPROFILE\.config\opencode\skill\qveris\SKILL.md"
 ```
-
-Replace `/path/to/QverisAI` with the actual path to this repository.
 
 Your skills directory should look like:
 ```

@@ -31,19 +31,21 @@ claude mcp remove qveris # Remove a server
 
 ## 2. Skills Configuration
 
-Copy the QVeris skill to your home directory:
+Download the skills from the GitHub repository:
+
+**Repository:** https://github.com/QVerisAI/QVerisAI/tree/main/skills
 
 **Mac:**
 ```bash
-mkdir -p ~/.claude/skills && cp -R /path/to/QverisAI/skills/* ~/.claude/skills/
+mkdir -p ~/.claude/skills/qveris
+curl -sL https://raw.githubusercontent.com/QVerisAI/QVerisAI/main/skills/qveris/SKILL.md -o ~/.claude/skills/qveris/SKILL.md
 ```
 
-**Windows (Command Prompt):**
-```cmd
-xcopy /E /I /Y "C:\path\to\QverisAI\skills\*" "%USERPROFILE%\.claude\skills\"
+**Windows (PowerShell):**
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills\qveris"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/QVerisAI/QVerisAI/main/skills/qveris/SKILL.md" -OutFile "$env:USERPROFILE\.claude\skills\qveris\SKILL.md"
 ```
-
-Replace `/path/to/QverisAI` with the actual path to this repository.
 
 Your skills directory should look like:
 ```
