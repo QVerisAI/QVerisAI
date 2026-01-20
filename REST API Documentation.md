@@ -215,9 +215,43 @@ If the tool generates data longer than max_response_size bytes, result will have
 ```json
 {
   "result": {
-    "message": "Result content is too long (199483 bytes). You can reference the truncated content (100 bytes) and download the full content from the url provided.",
-    "full_content_file_url": "http://qveris-tool-results-cache-bj.oss-cn-beijing.aliyuncs.com/tool_result_cache%2F20251201%2Fbinance.klines.retrieve.v1%2F485c19a324b24c319c6f4de6cc0eae30.json?OSSAccessKeyId=LTAI5tM3qNRZSgSrg1iSTALm&Expires=1764568180&Signature=ze1DXz6RnMOjMVz2wf%2BODxjJ%2Fc8%3D",
-    "truncated_content": "[[1678233600000, \"22198.56000000\", \"22287.00000000\", \"21580.00000000\", \"21705.44000000\", \"301460.572"
+    "message": "Result content is too long (3210 bytes). You can reference the truncated content (200 bytes) and download the full content from the url provided.",
+    "full_content_file_url": "http://qveris-tool-results-cache-bj.oss-cn-beijing.aliyuncs.com/tool_result_cache%2F20260120%2Fpubmed_refined.search_articles.v1%2F2409f329c07949a295b5ab0b704883ca.json?OSSAccessKeyId=LTAI5tM3qNRZSgSrg1iSTALm&Expires=1768920673&Signature=ThkQxoa9ryYHn%2F6XbVloiegS5ss%3D",
+    "truncated_content": "{\"query\": \"evolution\", \"sort\": \"relevance\", \"total_results\": 890994, \"returned\": 10, \"articles\": [{\"pmid\": \"34099656\", \"title\": \"Towards an engineering theory of evolution.\", \"journal\": \"Nature commun",
+    "content_schema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "total_results": {
+          "type": "number"
+        },
+        "returned": {
+          "type": "number"
+        },
+        "articles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pmid": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "journal": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 ```
@@ -227,6 +261,7 @@ If the tool generates data longer than max_response_size bytes, result will have
 | truncated_content | string | No | The initial max_response_size bytes of tool response. |
 | full_content_file_url | string | No | The url to the file that contains the full content. Valid for 120min. |
 | message | string | No | Message to LLM about the truncation. |
+| content_schema | object | No | The JSON schema of the full content. |
 
 ---
 
