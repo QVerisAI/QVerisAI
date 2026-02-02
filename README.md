@@ -2,7 +2,7 @@
 <div align="center">
   <img src="logo.png" width="120" alt="QVeris Logo" />
 
-  <h1>QVeris — The Tool OS for AI Agents</h1>
+  <h1>QVeris — The Tool & data OS for AI Agents</h1>
 
   <p><strong>One unified interface to use 10,000+ tools for your AI agents.</strong></p>
   <p>
