@@ -113,10 +113,10 @@ Download the skill definition file from:
 
 Save it as `.cursor/rules/qveris.mdc` in the project root.
 
-#### D. Other Environments (Trae, etc.)
+#### D. Other Environments (Trae, VSCode etc.)
 
 **Step 1: MCP Server Configuration**
-Find the MCP configuration file or setting for your specific tool.
+First figure out the MCP configuration file for your specific coding tool.
 - **Trae:** Typically `~/.trae/mcp.json` or `%USERPROFILE%\.trae\mcp.json`.
 
 Add the standard MCP server configuration to the `mcpServers` object:
