@@ -17,6 +17,8 @@ Do not proceed with setup until a valid API key is available.
 
 Before configuring QVeris, ensure the runtime environment is ready.
 
+**Note:** On Windows, use **cmd**, not PowerShell, for setup commands.
+
 ### Node.js
 The QVeris MCP server requires Node.js.
 1. Check if `node` is installed by running `node --version`.
