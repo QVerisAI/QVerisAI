@@ -73,7 +73,6 @@ Status Code: 200 OK
       "provider_name": "OpenWeatherMap",
       "provider_description": "Global weather data provider",
       "region": "global",
-      "avg-latency_ms": 100,
       "params": [
         {
           "name": "city",
@@ -94,10 +93,14 @@ Status Code: 200 OK
           "city": "London",
           "units": "metric"
         }
+      },
+      "stats": {
+          "avg_execution_time_ms": 21.74,
+          "success_rate": 0.909
       }
     }
   ],
-  "elapsed_time_ms": 245.6
+  "elapsed_time_ms": 245.6,
 }
 ```
 
@@ -120,7 +123,6 @@ Status Code: 200 OK
 | provider_name | string | No | Name of the tool provider |
 | provider_description | string | No | Description of the provider |
 | region | string | No | Region of the tool. "global" for global tools, "\|" separated whitelist (e.g. "US\|CA") or blacklist (e.g. "-CN\|RU") of country codes for regional tools |
-| avg-latency_ms | number | No | Average latency of the tool in milliseconds. |
 | params | array | No | Array of parameter definitions |
 | examples | object | No | Usage examples |
 | stats | object | No | Historical execution performance statistics |
@@ -497,3 +499,4 @@ You can then use below system prompt and start testing! Have fun exploring!
 }
 
 ```
+
