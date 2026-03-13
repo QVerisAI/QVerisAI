@@ -184,6 +184,35 @@ Latest capabilities and updates: [qveris.ai](https://qveris.ai)
 
 ---
 
+## Open Ecosystem
+
+QVeris's core routing engine runs as a managed service. We actively support the open-source ecosystem by open-sourcing all client-side tooling — MCP server, SDKs, Agent skills, and plugins — and contributing code to upstream projects.
+
+### Official projects
+
+| Repository | Description |
+|------------|-------------|
+| [QVerisAI/QVerisAI](https://github.com/QVerisAI/QVerisAI) | Core repo — skills, docs, llms.txt |
+| [QVerisAI/sdk-python](https://github.com/QVerisAI/sdk-python) | Python SDK |
+| [QVerisAI/QVerisBot](https://github.com/QVerisAI/QVerisBot) | MCP Server |
+| [QVerisAI/open-qveris-skills](https://github.com/QVerisAI/open-qveris-skills) | Community skills |
+
+Full list: [github.com/orgs/QVerisAI/repositories](https://github.com/orgs/QVerisAI/repositories)
+
+### Distribution channels
+
+- **ClawHub**: [clawhub.ai/skills?q=qveris](https://clawhub.ai/skills?sort=downloads&q=qveris) — official skills for OpenClaw agents
+- **npm**: [@qverisai](https://www.npmjs.com/org/qverisai) — MCP server and tooling packages
+
+### Upstream contributions
+
+QVeris actively contributes to the broader Agent ecosystem:
+
+- [openclaw/openclaw](https://github.com/openclaw/openclaw) — OpenClaw runtime
+- [openclaw/clawhub](https://github.com/openclaw/clawhub) — ClawHub skill registry
+
+---
+
 ## Community
 
 - 🐦 **X (Twitter)**: [x.com/QVerisAI](https://x.com/QVerisAI)

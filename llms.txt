@@ -45,6 +45,13 @@
 - REST API: https://github.com/QVerisAI/QVerisAI/blob/main/docs/rest-api.md
 - Online docs: https://qveris.ai/docs
 
+## Open Ecosystem
+- QVeris core engine is a managed service; all client-side tooling (MCP, SDK, skills, plugins) is open source
+- GitHub org: https://github.com/orgs/QVerisAI/repositories
+- ClawHub skills: https://clawhub.ai/skills?sort=downloads&q=qveris
+- npm org: https://www.npmjs.com/org/qverisai
+- Upstream contributions: openclaw/openclaw, openclaw/clawhub
+
 ## Links
 - Website: https://qveris.ai
 - Playground: https://qveris.ai/newchat

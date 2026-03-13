@@ -183,6 +183,35 @@ QVeris 采用按量计费，不是订阅制。
 
 ---
 
+## 开放生态
+
+QVeris 的 Discover / Inspect / Call 核心引擎作为托管服务持续在线运行。我们积极支持开源生态，将所有客户端工具 — MCP Server、SDK、Agent 技能、插件 — 全部开源，并向上下游项目持续贡献代码。
+
+### 官方项目
+
+| 仓库 | 说明 |
+|------|------|
+| [QVerisAI/QVerisAI](https://github.com/QVerisAI/QVerisAI) | 核心仓库 — 技能、文档、llms.txt |
+| [QVerisAI/sdk-python](https://github.com/QVerisAI/sdk-python) | Python SDK |
+| [QVerisAI/QVerisBot](https://github.com/QVerisAI/QVerisBot) | MCP Server |
+| [QVerisAI/open-qveris-skills](https://github.com/QVerisAI/open-qveris-skills) | 社区技能 |
+
+完整列表：[github.com/orgs/QVerisAI/repositories](https://github.com/orgs/QVerisAI/repositories)
+
+### 分发渠道
+
+- **ClawHub**：[clawhub.ai/skills?q=qveris](https://clawhub.ai/skills?sort=downloads&q=qveris) — 面向 OpenClaw Agent 的官方技能
+- **npm**：[@qverisai](https://www.npmjs.com/org/qverisai) — MCP Server 和工具包
+
+### 上游贡献
+
+QVeris 团队同时向 Agent 上游生态持续贡献代码：
+
+- [openclaw/openclaw](https://github.com/openclaw/openclaw) — OpenClaw 运行时
+- [openclaw/clawhub](https://github.com/openclaw/clawhub) — ClawHub 技能注册中心
+
+---
+
 ## 社区
 
 - 🐦 **X (Twitter)**：[x.com/QVerisAI](https://x.com/QVerisAI)

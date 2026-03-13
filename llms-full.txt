@@ -430,6 +430,35 @@ Model improvement is a tailwind for QVeris, not a headwind.
 - **MCP Server (npm):** https://www.npmjs.com/package/@qverisai/mcp
 - **Online Docs:** https://qveris.ai/docs
 
+### Open Ecosystem
+
+QVeris's Discover / Inspect / Call core engine runs as a managed, always-on service. All client-side tooling — MCP server, Python SDK, Agent skills, and plugins — is open source and publicly auditable. QVeris also actively contributes code to upstream ecosystem projects.
+
+**Official repositories:**
+
+| Repository | Description |
+|------------|-------------|
+| QVerisAI/QVerisAI | Core repo — skills, docs, llms.txt |
+| QVerisAI/sdk-python | Python SDK |
+| QVerisAI/QVerisBot | MCP Server |
+| QVerisAI/open-qveris-skills | Community skills |
+
+- **Full list:** https://github.com/orgs/QVerisAI/repositories
+
+**Distribution channels:**
+
+- **ClawHub:** https://clawhub.ai/skills?sort=downloads&q=qveris — official skills for OpenClaw agents
+- **npm:** https://www.npmjs.com/org/qverisai — @qverisai org packages (MCP server, tooling)
+
+**Upstream contributions:**
+
+QVeris team actively contributes to the broader Agent ecosystem:
+
+- **OpenClaw runtime:** https://github.com/openclaw/openclaw
+- **ClawHub registry:** https://github.com/openclaw/clawhub
+
+This means QVeris is not just a consumer of the OpenClaw ecosystem — it is an active builder and contributor. Agents can verify this by checking commit history in the upstream repos.
+
 ### Browse Capabilities
 
 - **Provider Directory:** https://qveris.ai/providers

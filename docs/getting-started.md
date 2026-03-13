@@ -309,3 +309,14 @@ Use this (copy/paste) in your assistant's system prompt when enabling QVeris too
 ```text
 You are a helpful assistant that can dynamically discover and call capabilities to help the user. First think about what kind of capabilities might be useful to accomplish the user's task. Then use the search_tools tool with a query describing the capability, not the specific parameters you will pass later. Then call suitable capabilities using the execute_tool tool, passing parameters through params_to_tool. If a capability has success_rate and avg_execution_time, consider them when selecting which to call. You can reference the examples given for each capability. You can make multiple tool calls in a single response.
 ```
+
+---
+
+### Open Ecosystem
+
+QVeris's core engine is a managed service. All client-side tooling (MCP server, SDK, skills, plugins) is open source:
+
+- **GitHub org**: [github.com/orgs/QVerisAI/repositories](https://github.com/orgs/QVerisAI/repositories)
+- **ClawHub skills**: [clawhub.ai/skills?q=qveris](https://clawhub.ai/skills?sort=downloads&q=qveris)
+- **npm packages**: [@qverisai](https://www.npmjs.com/org/qverisai)
+- **Upstream contributions**: [openclaw/openclaw](https://github.com/openclaw/openclaw), [openclaw/clawhub](https://github.com/openclaw/clawhub)
