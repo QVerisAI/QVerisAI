@@ -40,8 +40,8 @@
 ### 🤖 I'm an Agent
 
 > Your owner sent you here to learn about QVeris?
-> → Read the [Agent capability guide & install protocol](SETUP.md)
-> → Install the skill: [skills/qveris/SKILL.md](skills/qveris/SKILL.md)
+> → If you are an OpenClaw-style skill agent, use the official skill: [skills/openclaw/qveris-official/SKILL.md](skills/openclaw/qveris-official/SKILL.md)
+> → If you are running in Cursor / Claude Code / OpenCode, follow the [Agent capability guide & install protocol](SETUP.md)
 > → Core protocol: Discover (free) / Inspect (details) / Call (invoke)
 
 ### 🧑‍💻 I have OpenClaw / Cursor / Claude Code installed
@@ -50,12 +50,11 @@
 > `Install QVeris skill following https://qveris.ai/skill/instruct.md and use QVERIS_API_KEY=your-key`
 > → [Get API Key](https://qveris.ai/account?page=api-keys) (free, 1,000 credits on signup)
 
-### ⚙️ I'm a developer integrating via API / SDK
+### ⚙️ I'm a developer integrating via MCP / API / SDK
 
-> → [MCP Server docs](docs/mcp-server.md)
+> → [MCP Server](https://www.npmjs.com/package/@qverisai/mcp) — [docs](docs/mcp-server.md)
 > → [REST API docs](docs/rest-api.md)
 > → [Python SDK](https://github.com/QVerisAI/sdk-python)
-> → [MCP Server](https://www.npmjs.com/package/@qverisai/mcp)
 
 ---
 

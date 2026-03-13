@@ -271,4 +271,4 @@ If direct `npx` execution fails in some clients, wrap with `cmd /c`:
 - [Getting started](getting-started.md)
 - [REST API documentation](rest-api.md)
 - [Agent setup guide](../SETUP.md)
-- [Agent skill definition](../skills/qveris/SKILL.md)
+- [MCP/client skill definition](../skills/qveris/SKILL.md)

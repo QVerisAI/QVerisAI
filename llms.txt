@@ -39,7 +39,7 @@
 ## Install
 - Agent install protocol: https://qveris.ai/skill/instruct.md
 - Multi-environment setup: https://github.com/QVerisAI/QVerisAI/blob/main/SETUP.md
-- Skill definition: https://github.com/QVerisAI/QVerisAI/blob/main/skills/qveris/SKILL.md
+- MCP/client skill definition: https://github.com/QVerisAI/QVerisAI/blob/main/skills/qveris/SKILL.md
 
 ## API docs
 - MCP Server: https://github.com/QVerisAI/QVerisAI/blob/main/docs/mcp-server.md

@@ -39,8 +39,8 @@
 ### 🤖 我是 Agent
 
 > 你的主人让你来了解 QVeris？
-> → 阅读 [Agent 能力说明与安装协议](SETUP.md)
-> → 安装技能：[skills/qveris/SKILL.md](skills/qveris/SKILL.md)
+> → 如果你是 OpenClaw 类型的技能 Agent，请使用官方技能：[skills/openclaw/qveris-official/SKILL.md](skills/openclaw/qveris-official/SKILL.md)
+> → 如果你运行在 Cursor / Claude Code / OpenCode 中，请阅读 [Agent 能力说明与安装协议](SETUP.md)
 > → 核心协议：Discover（免费发现能力）/ Inspect（查看详情）/ Call（调用能力）
 
 ### 🧑‍💻 我已经装了 OpenClaw / Cursor / Claude Code

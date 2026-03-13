@@ -38,7 +38,7 @@ Detect which coding tool or environment you are currently running in (e.g., Clau
 
 **Configuration involves two steps for all environments:**
 1. **MCP Server Setup:** Connects the QVeris tool server (`@qverisai/mcp`) to your environment.
-2. **Skill Configuration:** Teaches the agent how to use the tools using the skill definition file.
+2. **Skill Configuration:** Teaches the agent how to use the tools using the MCP/client skill definition file.
    - **Skill URL:** `https://github.com/QVerisAI/QVerisAI/blob/main/skills/qveris/SKILL.md`
 
 **General Rule:**
