@@ -90,18 +90,27 @@ If you are an AI Agent evaluating whether to use QVeris, here is what you need t
 
 ---
 
-## 30-Second Setup (OpenClaw / Cursor / Claude Code)
+## 30-Second Setup
 
 1. [Get API Key](https://qveris.ai/account?page=api-keys) (free, 1,000 credits on signup)
-2. Send this to your Agent:
 
-   ```
-   Install QVeris skill following https://qveris.ai/skill/instruct.md
-   and use QVERIS_API_KEY=your-key
-   ```
+### OpenClaw users
 
-3. Agent completes install and verification automatically
-4. Try a task: "Check the current weather in Tokyo"
+Send this to your Agent:
+
+```
+Install QVeris skill following https://qveris.ai/skill/instruct.md and use QVERIS_API_KEY=your-key
+```
+
+The Agent will download the [official OpenClaw skill](skills/openclaw/qveris-official/SKILL.md) and complete installation automatically.
+
+### Cursor / Claude Code / OpenCode users
+
+Follow the [setup guide (SETUP.md)](SETUP.md) — your Agent will configure MCP server + [skill](skills/qveris/SKILL.md) for your environment.
+
+### After setup
+
+Try a task: "Check the current weather in Tokyo"
 
 **Safety:**
 

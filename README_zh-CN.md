@@ -90,18 +90,27 @@
 
 ---
 
-## 30 秒接入（OpenClaw / Cursor / Claude Code 用户）
+## 30 秒接入
 
 1. [获取 API Key](https://qveris.ai/account?page=api-keys)（免费注册即得 1,000 credits）
-2. 把下面这句话发给你的 Agent：
 
-   ```
-   Install QVeris skill following https://qveris.ai/skill/instruct.md
-   and use QVERIS_API_KEY=你的key
-   ```
+### OpenClaw 用户
 
-3. Agent 会自动完成安装与验证
-4. 试一个任务："帮我查一下东京现在的天气"
+把下面这句话发给你的 Agent：
+
+```
+Install QVeris skill following https://qveris.ai/skill/instruct.md and use QVERIS_API_KEY=你的key
+```
+
+Agent 会自动下载 [OpenClaw 官方技能](skills/openclaw/qveris-official/SKILL.md) 并完成安装。
+
+### Cursor / Claude Code / OpenCode 用户
+
+请按照 [安装指南 (SETUP.md)](SETUP.md) 操作 — Agent 会为你的环境配置 MCP server + [技能](skills/qveris/SKILL.md)。
+
+### 安装完成后
+
+试一个任务："帮我查一下东京现在的天气"
 
 **安全承诺：**
 
