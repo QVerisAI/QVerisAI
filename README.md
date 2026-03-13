@@ -52,9 +52,10 @@
 
 ### ⚙️ I'm a developer integrating via MCP / API / SDK
 
-> → [MCP Server](https://www.npmjs.com/package/@qverisai/mcp) — [docs](docs/mcp-server.md)
-> → [REST API docs](docs/rest-api.md)
+> → [MCP Server 文档](docs/mcp-server.md)
+> → [REST API 文档](docs/rest-api.md)
 > → [Python SDK](https://github.com/QVerisAI/sdk-python)
+> → [MCP Server](https://www.npmjs.com/package/@qverisai/mcp)
 
 ---
 
