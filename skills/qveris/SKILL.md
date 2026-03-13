@@ -1,12 +1,13 @@
 ---
 name: QVeris
-description: Find third-party APIs and connect to them in code to assist users in various fields such as finance, economics, healthcare, sports, scientific research, and more
+description: Discover and call 10,000+ capabilities (APIs, data sources, automations) across finance, weather, search, docs, healthcare, sports, and more
 ---
 
 Whenever an external functionality is needed, do the following steps:
 
-1. **FIND A QVERISAI's TOOL**: You can use the qveris MCP server to find API tools to assist users. Firstly, consider which tools may be useful for completing user tasks. Then, use the search_tools tool and enter a query that describes the tool's functionality, rather than the parameters you will pass to the tool later. Limit the number of results to 10 if no special requirements. Next, you should use the Execute_tool to try out a suitable search tool and pass parameters to the search tool through params_to_tool. You can refer to the examples provided by each tool (if any). You can call multiple searches in a single response. The previous steps of interaction between search_tool and executioner_tool can help you find available tools.
-2. **CALL QVERISAI's TOOL**: Once you find a suitable tool, you can use the qveris execute rest API described below to write code that calls the tool to meet user needs. Notice that you should not use the tool call's result from first step, you will generate real product code for user, and use the api key in the mcp server's config in the code. The generated code no longer requires a search interface call, and you can directly use the tool of MCP's choice. You can set request's timeout to 5 seconds, and you should handle the error returns of the REST API correctly.
+1. **DISCOVER**: Use the qveris MCP server to discover capabilities. Consider which capabilities may help the user's task. Then use the `search_tools` tool with a query describing the capability, not the parameters you will pass later. Limit results to 10 unless specified otherwise. Shortlist one or more candidate `tool_id`s from the results.
+2. **INSPECT**: Before choosing a capability, inspect shortlisted `tool_id`s when you need fuller details about parameters, examples, success rate, or latency. Use the `POST /tools/by-ids` endpoint documented below, especially when multiple candidates match or the parameter contract is unclear.
+3. **CALL IN CODE**: Once you select a suitable capability, use the qveris execute REST API described below to write code that calls it. Do not use the MCP tool call result directly — generate real production code for the user, using the API key from the MCP server config. The generated code should call the selected capability directly, optionally using `/tools/by-ids` first if you need to validate details before execution. Set request timeout to 5 seconds and handle error returns correctly.
 
 # QVeris API Documentation
 
@@ -27,7 +28,31 @@ https://qveris.ai/api/v1
 
 ## API Endpoints
 
-### 1. Execute Tool
+### 1. Inspect — Get Tool Details
+
+Get detailed information about specific tools by their IDs, including parameters, success rate, and latency.
+
+#### Endpoint
+
+``` http
+POST /tools/by-ids
+```
+
+#### Example Request Body
+
+``` json
+{
+  "tool_ids": ["openweathermap.weather.execute.v1"],
+  "search_id": "string",
+  "session_id": "string"
+}
+```
+
+#### Example Response (200 OK)
+
+Same schema as the `/search` response — returns full tool details including params, examples, and stats.
+
+### 2. Execute Tool
 
 Execute a tool with specified parameters.
 

@@ -2,12 +2,15 @@
 
 ## What is QVeris
 
-**QVeris** is a **tool search + tool execution** layer for LLM agents. It lets your agent:
+**QVeris** is the **capability routing network for agents**. It lets your agent:
 
-- **Search** for live tools (APIs, data sources, automations) using natural language.
-- **Execute** any discovered tool by passing the required parameters.
+- **Discover** capabilities (APIs, data sources, automations) using natural language — free
+- **Inspect** candidate capabilities to compare parameters, success rate, latency, and price
+- **Call** any capability with structured parameters and get structured results back
 
-QVeris works well in agent loops (tool discovery → tool execution → feed results back to the model) and supports multiple integration styles.
+QVeris works well in agent loops (Discover → Inspect → Call → feed results back to the model) and supports multiple integration styles.
+
+**Cost:** Discover is free. Call costs 1–100 credits per invocation, priced by data and task value. Free tier includes 1,000 credits. Details at [qveris.ai/pricing](https://qveris.ai/pricing).
 
 ---
 
@@ -19,8 +22,11 @@ There are three ways to use QVeris.
 
 If your client supports **Model Context Protocol (MCP)**, you can add the official QVeris MCP server and immediately get:
 
-- `search_tools`
-- `execute_tool`
+- `search_tools` (Discover)
+- `get_tools_by_ids` (Inspect)
+- `execute_tool` (Call)
+
+For the full MCP reference, see [MCP Server documentation](mcp-server.md).
 
 **Configure (Cursor / any MCP client)**
 
@@ -29,7 +35,7 @@ If your client supports **Model Context Protocol (MCP)**, you can add the offici
   "mcpServers": {
     "qveris": {
       "command": "npx",
-      "args": ["@qverisai/mcp"],
+      "args": ["-y", "@qverisai/mcp"],
       "env": {
         "QVERIS_API_KEY": "your-api-key-here"
       }
@@ -40,13 +46,13 @@ If your client supports **Model Context Protocol (MCP)**, you can add the offici
 
 **Try it**
 
-> “Find me a weather tool and get the current weather in Tokyo”
+> "Discover a weather capability and get the current weather in Tokyo"
 
 The assistant will:
 
-- call `search_tools` with a capability query (e.g. “weather”)
-- pick a tool from results
-- call `execute_tool` with the tool id + parameters
+- call `search_tools` to discover matching capabilities (e.g. "weather")
+- optionally call `get_tools_by_ids` to inspect the best candidate
+- call `execute_tool` with the capability id + parameters
 
 ---
 
@@ -72,7 +78,7 @@ from qveris import Agent, Message
 
 async def main():
     agent = Agent()
-    messages = [Message(role="user", content="Find a weather tool and check New York weather.")]
+    messages = [Message(role="user", content="Discover a weather capability and check New York weather.")]
     async for event in agent.run(messages):
         if event.type == "content" and event.content:
             print(event.content, end="", flush=True)
@@ -97,7 +103,7 @@ Send your API key in the `Authorization` header:
 Authorization: Bearer YOUR_API_KEY
 ```
 
-#### 1) Search tools
+#### 1) Discover capabilities
 
 `POST /search`
 
@@ -110,7 +116,7 @@ curl -sS -X POST "https://qveris.ai/api/v1/search" \
   -d "{\"query\":\"weather forecast API\",\"limit\":10}"
 ```
 
-You’ll get a `search_id` and a list of tools (each with `tool_id`, params schema, examples, etc.).
+You'll get a `search_id` and a list of capabilities (each with `tool_id`, params schema, examples, etc.).
 
 **Python**
 
@@ -155,20 +161,76 @@ console.log(data.search_id);
 console.log(data.results?.[0]?.tool_id);
 ```
 
-#### 2) Execute a tool
+#### 2) Inspect capabilities
+
+`POST /tools/by-ids`
+
+Before calling, you can inspect one or more capabilities to see full details (parameters, success rate, latency, etc.).
+
+**cURL**
+
+```bash
+curl -sS -X POST "https://qveris.ai/api/v1/tools/by-ids" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{\"tool_ids\":[\"openweathermap.weather.execute.v1\"],\"search_id\":\"YOUR_SEARCH_ID\"}"
+```
+
+**Python**
+
+```python
+resp = requests.post(
+    "https://qveris.ai/api/v1/tools/by-ids",
+    headers={
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json",
+    },
+    json={
+        "tool_ids": ["openweathermap.weather.execute.v1"],
+        "search_id": "YOUR_SEARCH_ID",
+    },
+    timeout=30,
+)
+resp.raise_for_status()
+print(resp.json())
+```
+
+**TypeScript**
+
+```typescript
+const resp = await fetch("https://qveris.ai/api/v1/tools/by-ids", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${apiKey}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    tool_ids: ["openweathermap.weather.execute.v1"],
+    search_id: "YOUR_SEARCH_ID",
+  }),
+});
+
+if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${await resp.text()}`);
+const data = await resp.json();
+console.log(data.results);
+```
+
+Returns the same schema as `/search` — full capability details including params, examples, and stats.
+
+#### 3) Call a capability
 
 `POST /tools/execute?tool_id={tool_id}`
 
-**cURL** (execute the tool returned by search)
+**cURL** (call the capability returned by Discover)
 
 ```bash
-curl -sS -X POST "https://qveris.ai/api/v1/tools/execute?tool_id=openweathermap_current_weather" \
+curl -sS -X POST "https://qveris.ai/api/v1/tools/execute?tool_id=openweathermap.weather.execute.v1" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d "{\"search_id\":\"YOUR_SEARCH_ID\",\"parameters\":{\"city\":\"London\",\"units\":\"metric\"},\"max_response_size\":20480}"
 ```
 
-If tool output exceeds `max_response_size`, the response includes `truncated_content` plus a temporary `full_content_file_url`.
+If output exceeds `max_response_size`, the response includes `truncated_content` plus a temporary `full_content_file_url`.
 
 **Python**
 
@@ -178,7 +240,7 @@ import requests
 
 API_KEY = os.environ["QVERIS_API_KEY"]
 
-tool_id = "openweathermap_current_weather"  # from search results
+tool_id = "openweathermap.weather.execute.v1"  # from Discover results
 search_id = "YOUR_SEARCH_ID"  # from /search response
 
 resp = requests.post(
@@ -203,7 +265,7 @@ print(resp.json())
 ```typescript
 const apiKey = process.env.QVERIS_API_KEY!;
 
-const toolId = "openweathermap_current_weather"; // from search results
+const toolId = "openweathermap.weather.execute.v1"; // from Discover results
 const searchId = "YOUR_SEARCH_ID"; // from /search response
 
 const resp = await fetch(
@@ -232,7 +294,7 @@ console.log(data);
 ### How to get an API key
 
 1. Go to [QVeris](https://qveris.ai)
-2. Sign in / create an account
+2. Sign in / create an account (free, 1,000 credits on signup)
 3. Create an API key
 4. Use it as:
    - `QVERIS_API_KEY` env var (MCP / Python SDK), or
@@ -242,10 +304,8 @@ console.log(data);
 
 ### Recommended system prompt
 
-Use this (copy/paste) in your assistant’s system prompt when enabling QVeris tools:
+Use this (copy/paste) in your assistant's system prompt when enabling QVeris tools:
 
 ```text
-You are a helpful assistant that can dynamically search and execute tools to help the user. First think about what kind of tools might be useful to accomplish the user's task. Then use the search_tools tool with query describing the capability of the tool, not what params you want to pass to the tool later. Then call suitable searched tool(s) using the execute_tool tool, passing parameters to the searched tool through params_to_tool. If tool has weighted_success_rate and avg_execution_time (in seconds), consider them when selecting which tool to call. You could reference the examples given if any for each tool. You could call make multiple tool calls in a single response.
+You are a helpful assistant that can dynamically discover and call capabilities to help the user. First think about what kind of capabilities might be useful to accomplish the user's task. Then use the search_tools tool with a query describing the capability, not the specific parameters you will pass later. Then call suitable capabilities using the execute_tool tool, passing parameters through params_to_tool. If a capability has success_rate and avg_execution_time, consider them when selecting which to call. You can reference the examples given for each capability. You can make multiple tool calls in a single response.
 ```
-
-
