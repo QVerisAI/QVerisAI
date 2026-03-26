@@ -44,10 +44,18 @@ def execute_tool(tool_id: str, search_id: str, params: dict) -> dict:
         timeout=5,
     )
     resp.raise_for_status()
-    data = resp.json()
+    try:
+        data = resp.json()
+    except requests.exceptions.JSONDecodeError:
+        raise RuntimeError("Failed to decode API response as JSON.")
+
     if not data.get("success"):
-        raise RuntimeError(f"QVeris error: {data.get('error_message')}")
-    return data["result"]
+        raise RuntimeError(f"QVeris error: {data.get('error_message', 'Unknown error')}")
+
+    result = data.get("result")
+    if result is None:
+        raise RuntimeError("API response is missing the 'result' field.")
+    return result
 
 # Usage
 result = execute_tool(
