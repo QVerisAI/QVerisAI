@@ -84,9 +84,14 @@ Add or merge this JSON structure:
       "environment": { "QVERIS_API_KEY": "YOUR_QVERIS_API_KEY" },
       "enabled": true
     }
+  },
+  "tools": {
+    "qveris*": true
   }
 }
 ```
+
+> **Important:** The `tools` section is **required**. OpenCode connects MCP servers but **disables their tools by default**. Without `"tools": { "qveris*": true }`, the MCP server will show as connected but all `qveris_*` tools will be unavailable. The wildcard pattern `qveris*` enables all tools whose names start with `qveris`.
 
 **Step 2: Skill Configuration**
 Download the skill definition file from:
@@ -139,6 +144,65 @@ Add the standard MCP server configuration to the `mcpServers` object:
 **Step 2: Skill Configuration**
 If the environment supports rule or skill files, add the file from:
 `https://github.com/QVerisAI/QVerisAI/blob/main/skills/qveris/SKILL.md`
+
+#### E. OpenClaw
+
+OpenClaw supports two integration methods. The Plugin method is recommended for full functionality.
+
+**Method 1: Plugin (Recommended)**
+
+1. Install the QVeris plugin:
+```bash
+openclaw plugins install @qverisai/qveris
+```
+
+2. Edit the configuration file `openclaw.json`:
+```json
+{
+  "plugins": {
+    "allow": ["qveris"],
+    "entries": {
+      "qveris": {
+        "enabled": true,
+        "config": {
+          "apiKey": "YOUR_QVERIS_API_KEY",
+          "region": "global"
+        }
+      }
+    }
+  },
+  "tools": {
+    "alsoAllow": ["qveris"]
+  }
+}
+```
+
+> **Advantage:** Tools are registered in the runtime, not injected into the prompt — no context competition. Session state is automatically tracked across discover-inspect-call sequences.
+
+**Method 2: Skill (Lightweight Alternative)**
+
+1. Install the skill:
+```bash
+openclaw skills install qveris-official
+```
+
+2. Edit the configuration file `~/.openclaw/openclaw.json`:
+```json
+{
+  "skills": {
+    "entries": {
+      "qveris-official": {
+        "enabled": true,
+        "apiKey": "YOUR_QVERIS_API_KEY"
+      }
+    }
+  }
+}
+```
+
+> **Note:** The Plugin method requires Node.js; the Skill method does not.
+
+More details: https://qveris.ai/docs/openclaw-setup
 
 ## 3. Verify Installation
 
