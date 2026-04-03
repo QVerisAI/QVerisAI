@@ -32,7 +32,7 @@ export async function runInteractive(flags) {
     const input = line.trim();
     if (!input) { rl.prompt(); return; }
 
-    const parts = input.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+    const parts = parseArgs(input);
     const cmd = parts[0]?.toLowerCase();
     const rest = parts.slice(1);
 
@@ -114,6 +114,29 @@ function resolveId(raw, state) {
     }
   }
   return raw;
+}
+
+/** Shell-style argument splitting: handles double quotes, single quotes, and backslash escapes. */
+function parseArgs(input) {
+  const args = [];
+  let current = "";
+  let inDouble = false;
+  let inSingle = false;
+  let escape = false;
+
+  for (const ch of input) {
+    if (escape) { current += ch; escape = false; continue; }
+    if (ch === "\\" && !inSingle) { escape = true; continue; }
+    if (ch === '"' && !inSingle) { inDouble = !inDouble; continue; }
+    if (ch === "'" && !inDouble) { inSingle = !inSingle; continue; }
+    if ((ch === " " || ch === "\t") && !inDouble && !inSingle) {
+      if (current) { args.push(current); current = ""; }
+      continue;
+    }
+    current += ch;
+  }
+  if (current) args.push(current);
+  return args;
 }
 
 function printHelp() {

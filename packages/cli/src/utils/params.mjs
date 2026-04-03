@@ -8,7 +8,8 @@ export function resolveParams(value) {
 
   if (value === "-") {
     try {
-      raw = readFileSync("/dev/stdin", "utf-8");
+      // Use fd 0 (stdin) which works cross-platform (Linux, macOS, Windows)
+      raw = readFileSync(0, "utf-8");
     } catch {
       throw new CliError("PARAMS_INVALID_JSON", "Failed to read from stdin");
     }
