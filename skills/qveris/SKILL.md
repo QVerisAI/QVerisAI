@@ -28,8 +28,11 @@ Once a suitable tool is identified, generate code that calls the QVeris REST API
 ```python
 import requests
 
-API_KEY = "<QVERIS_API_KEY from MCP config>"
-BASE_URL = "https://qveris.ai/api/v1"
+import os
+
+API_KEY = os.environ.get("QVERIS_API_KEY", "<QVERIS_API_KEY from MCP config>")
+# Auto-detect region from key prefix: sk-cn-xxx → qveris.cn, sk-xxx → qveris.ai
+BASE_URL = "https://qveris.cn/api/v1" if API_KEY.startswith("sk-cn-") else "https://qveris.ai/api/v1"
 
 def execute_tool(tool_id: str, search_id: str, params: dict) -> dict:
     """Execute a QVeris tool and return the result."""
@@ -70,7 +73,7 @@ print(result)  # {"data": {"temperature": 15.5, "humidity": 72}}
 
 ### API Reference
 
-**Base URL:** `https://qveris.ai/api/v1`
+**Base URL:** `https://qveris.ai/api/v1` (global) or `https://qveris.cn/api/v1` (China, key prefix `sk-cn-`)
 
 **Authentication:** `Authorization: Bearer YOUR_API_KEY`
 
