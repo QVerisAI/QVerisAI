@@ -220,7 +220,7 @@ The Agent will automatically download the [official OpenClaw skill](https://gith
 
 ### For Cursor / Claude Code / OpenCode Users
 
-Follow the [setup guide (SETUP.md)](https://github.com/QVerisAI/QVerisAI/blob/main/SETUP.md) — your Agent will configure MCP server + [skill definition](https://github.com/QVerisAI/QVerisAI/blob/main/skills/qveris/SKILL.md) for your environment.
+Follow the [setup guide (SETUP.md)](https://github.com/QVerisAI/QVerisAI/blob/main/agent/SETUP.md) — your Agent will configure MCP server + [skill definition](https://github.com/QVerisAI/QVerisAI/blob/main/skills/qveris/SKILL.md) for your environment.
 
 ### Prerequisites
 

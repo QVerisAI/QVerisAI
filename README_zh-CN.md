@@ -40,7 +40,7 @@
 
 > 你的主人让你来了解 QVeris？
 > → 如果你是 OpenClaw 类型的技能 Agent，请使用官方技能：[skills/openclaw/qveris-official/SKILL.md](skills/openclaw/qveris-official/SKILL.md)
-> → 如果你运行在 Cursor / Claude Code / OpenCode 中，请阅读 [Agent 能力说明与安装协议](SETUP.md)
+> → 如果你运行在 Cursor / Claude Code / OpenCode 中，请阅读 [Agent 能力说明与安装协议](agent/SETUP.md)
 > → 核心协议：Discover（免费发现能力）/ Inspect（查看详情）/ Call（调用能力）
 
 ### 🧑‍💻 我已经装了 OpenClaw / Cursor / Claude Code
@@ -72,7 +72,7 @@
 
 **安装方式：**
 
-- 详见 [SETUP.md](SETUP.md) — 支持 OpenClaw / Claude Code / Cursor / OpenCode / Trae 等环境
+- 详见 [SETUP.md](agent/SETUP.md) — 支持 OpenClaw / Claude Code / Cursor / OpenCode / Trae 等环境
 - 安装过程默认不修改 shell 启动文件，仅做会话级配置
 - 安装后必须通过文件检查和 CLI 验证才算成功
 
@@ -106,7 +106,7 @@ Agent 会自动下载 [OpenClaw 官方技能](skills/openclaw/qveris-official/SK
 
 ### Cursor / Claude Code / OpenCode 用户
 
-请按照 [安装指南 (SETUP.md)](SETUP.md) 操作 — Agent 会为你的环境配置 MCP server + [技能](skills/qveris/SKILL.md)。
+请按照 [安装指南 (agent/SETUP.md)](agent/SETUP.md) 操作 — Agent 会为你的环境配置 MCP server + [技能](skills/qveris/SKILL.md)。
 
 ### 安装完成后
 
@@ -187,21 +187,34 @@ QVeris 采用按量计费，不是订阅制。
 
 QVeris 的 Discover / Inspect / Call 核心引擎作为托管服务持续在线运行。我们积极支持开源生态，将所有客户端工具 — MCP Server、SDK、Agent 技能、插件 — 全部开源，并向上下游项目持续贡献代码。
 
-### 官方项目
+### Monorepo 包
+
+本仓库（`QVerisAI/QVerisAI`）是 QVeris 客户端工具的主 monorepo：
+
+| 包 | 路径 | npm |
+|---|------|-----|
+| MCP Server | [`packages/mcp`](packages/mcp) | [@qverisai/mcp](https://www.npmjs.com/package/@qverisai/mcp) |
+| CLI 命令行工具 | [`packages/cli`](packages/cli) | [@qverisai/cli](https://www.npmjs.com/package/@qverisai/cli) |
+| Agent 文档 | [`agent/`](agent) | — |
+| 技能定义 | [`skills/`](skills) | — |
+
+### 其他仓库
 
 | 仓库 | 说明 |
 |------|------|
-| [QVerisAI/QVerisAI](https://github.com/QVerisAI/QVerisAI) | 核心仓库 — 技能、文档、llms.txt |
 | [QVerisAI/sdk-python](https://github.com/QVerisAI/sdk-python) | Python SDK |
-| [@qverisai/mcp (npm)](https://www.npmjs.com/package/@qverisai/mcp) | MCP Server |
-| [QVerisAI/open-qveris-skills](https://github.com/QVerisAI/open-qveris-skills) | 社区技能 |
+| [QVerisAI/open-qveris-skills](https://github.com/QVerisAI/open-qveris-skills) | 社区技能（股票分析、市场报告等） |
+| [QVerisAI/openclaw-qveris-plugin](https://github.com/QVerisAI/openclaw-qveris-plugin) | OpenClaw 插件 |
+| [QVerisAI/vscode-qveris-ai](https://github.com/QVerisAI/vscode-qveris-ai) | VS Code 扩展 |
 
 完整列表：[github.com/orgs/QVerisAI/repositories](https://github.com/orgs/QVerisAI/repositories)
 
 ### 分发渠道
 
-- **ClawHub**：[clawhub.ai/skills?q=qveris](https://clawhub.ai/skills?sort=downloads&q=qveris) — 面向 OpenClaw Agent 的官方技能
-- **npm**：[@qverisai](https://www.npmjs.com/org/qverisai) — MCP Server 和工具包
+- **npm**：[@qverisai](https://www.npmjs.com/org/qverisai) — MCP Server、CLI
+- **PyPI**：[QVerisAI/sdk-python](https://github.com/QVerisAI/sdk-python) — Python SDK
+- **ClawHub**：[clawhub.ai/skills?q=qveris](https://clawhub.ai/skills?sort=downloads&q=qveris) — OpenClaw 技能
+- **一键安装**：`curl -fsSL https://qveris.ai/install | bash`
 
 ### 上游贡献
 

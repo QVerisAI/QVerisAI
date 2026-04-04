@@ -94,6 +94,7 @@ QVERIS_API_KEY=your-api-key
 
 各环境的详细配置指南，请参考：
 
+- [Agent 安装指南](../../agent/SETUP.md)
 - [Claude Code 配置](claude-code-setup.md)
 - [OpenCode 配置](opencode-setup.md)
 - [IDE / CLI 配置](ide-cli-setup.md)
@@ -177,7 +178,7 @@ QVERIS_API_KEY=your-api-key
 |-----|------|------|------|
 | `tool_id` | string | 是 | 来自发现结果的工具 ID |
 | `search_id` | string | 是 | 发现该工具的搜索 ID |
-| `params_to_tool` | string | 是 | JSON 字符串化的工具参数 |
+| `params_to_tool` | object | 是 | 传递给工具的参数字典 |
 | `session_id` | string | 否 | 用于追踪的会话标识符 |
 | `max_response_size` | number | 否 | 最大响应字节数（默认 `20480`） |
 
@@ -187,7 +188,7 @@ QVERIS_API_KEY=your-api-key
 {
   "tool_id": "openweathermap.weather.execute.v1",
   "search_id": "YOUR_SEARCH_ID",
-  "params_to_tool": "{\"city\":\"London\",\"units\":\"metric\"}"
+  "params_to_tool": {"city": "London", "units": "metric"}
 }
 ```
 
@@ -250,7 +251,7 @@ QVERIS_API_KEY=your-api-key
 - 验证 API 密钥是否有效
 - 验证所选 `tool_id` 来自此前的发现结果
 - 重新运行 `get_tools_by_ids` 检查工具后再调用
-- 检查 `params_to_tool` 是否为有效 JSON
+- 检查 `params_to_tool` 是否为有效对象
 
 ### Windows 特定问题
 
@@ -269,4 +270,5 @@ QVERIS_API_KEY=your-api-key
 
 - [快速开始](getting-started.md)
 - [REST API 文档](rest-api.md)
+- [Agent 安装指南](../../agent/SETUP.md)
 - [IDE / CLI 配置指南](ide-cli-setup.md)
