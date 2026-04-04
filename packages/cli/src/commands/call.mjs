@@ -41,7 +41,7 @@ export async function runCall(idOrIndex, flags) {
     discoveryId = resolved.discoveryId;
   }
   if (!discoveryId) discoveryId = getSessionDiscoveryId();
-  if (!discoveryId) {
+  if (!discoveryId && /\\d+/.test(idOrIndex)) {
     throw new CliError("SESSION_EXPIRED", "No discovery ID. Run 'qveris discover' first or pass --discovery-id.");
   }
 
