@@ -54,7 +54,6 @@ done; then
   warn "Global install failed, trying user-local install..."
   NPM_DIR="${HOME}/.npm-global"
   mkdir -p "$NPM_DIR"
-  npm config set prefix "$NPM_DIR" 2>/dev/null || true
   if ! npm_output=$(npm install -g @qverisai/cli --prefix "$NPM_DIR" 2>&1); then
     echo "$npm_output" | grep -i err
   fi

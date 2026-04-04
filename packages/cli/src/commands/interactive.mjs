@@ -6,6 +6,7 @@ import { formatDiscoverResult, formatInspectResult, formatCallResult } from "../
 import { generateSnippet } from "../output/codegen.mjs";
 import { bold, dim, cyan } from "../output/colors.mjs";
 import { handleError } from "../errors/handler.mjs";
+import { createSpinner } from "../output/spinner.mjs";
 
 export async function runInteractive(flags) {
   const apiKey = resolveApiKey(flags.apiKey);
@@ -45,7 +46,9 @@ export async function runInteractive(flags) {
         case "search": {
           const query = rest.join(" ");
           if (!query) { console.log("  Usage: discover <query>"); break; }
+          const sp = createSpinner("Discovering...");
           const result = await discoverTools({ apiKey, baseUrl, query, limit, timeoutMs: discoverTimeout });
+          sp.stop();
           state.discoveryId = result.search_id;
           state.results = (result.results ?? []).map((t, i) => ({ index: i + 1, tool_id: t.tool_id, name: t.name }));
           console.log(formatDiscoverResult(result));
@@ -54,7 +57,9 @@ export async function runInteractive(flags) {
         case "inspect": {
           const toolId = resolveId(rest[0], state);
           if (!toolId) { console.log("  Usage: inspect <index|tool_id>"); break; }
+          const sp2 = createSpinner("Inspecting...");
           const result = await inspectToolsByIds({ apiKey, baseUrl, toolIds: [toolId], discoveryId: state.discoveryId, timeoutMs: discoverTimeout });
+          sp2.stop();
           console.log(formatInspectResult(result));
           break;
         }
@@ -64,7 +69,9 @@ export async function runInteractive(flags) {
           if (!state.discoveryId) { console.log("  Run 'discover' first."); break; }
           const paramsStr = rest.slice(1).join(" ") || "{}";
           const parameters = resolveParams(paramsStr);
+          const sp3 = createSpinner("Calling...");
           const result = await callTool({ apiKey, baseUrl, toolId, discoveryId: state.discoveryId, parameters, timeoutMs: callTimeout });
+          sp3.stop();
           console.log(formatCallResult(result));
           if (result.success) {
             state.lastCallContext = { toolId, discoveryId: state.discoveryId, parameters };

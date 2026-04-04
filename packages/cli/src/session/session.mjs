@@ -25,7 +25,7 @@ export function readSession() {
 export function writeSession(data) {
   const dir = dirname(sessionPath());
   mkdirSync(dir, { recursive: true });
-  writeFileSync(sessionPath(), JSON.stringify({ ...data, timestamp: Date.now() }, null, 2) + "\n");
+  writeFileSync(sessionPath(), JSON.stringify({ ...data, timestamp: Date.now() }, null, 2) + "\n", { mode: 0o600 });
 }
 
 export function resolveToolId(idOrIndex) {

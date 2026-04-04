@@ -10,7 +10,7 @@ async function requestJson(path, { method = "POST", query = {}, body, timeoutMs 
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const url = new URL(`${baseUrl}${path}`);
+    const url = new URL(baseUrl.replace(/\/$/, "") + path);
     for (const [key, value] of Object.entries(query)) {
       if (value !== undefined && value !== null) {
         url.searchParams.set(key, String(value));
