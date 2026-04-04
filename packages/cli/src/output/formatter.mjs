@@ -171,7 +171,6 @@ export function formatInspectResult(tools) {
 
 export function formatCallResult(result) {
   const success = result.success ?? false;
-  const execTimeRaw = result.execution_time ?? result.elapsed_time_ms;
   const cost = result.cost ?? result.credits_used ?? 0;
   const remaining = result.remaining_credits;
   const executionId = result.execution_id;
@@ -181,9 +180,11 @@ export function formatCallResult(result) {
   // Status line
   if (success) {
     let timePart = "";
-    if (typeof execTimeRaw === "number") {
-      const ms = execTimeRaw < 10 ? Math.round(execTimeRaw * 1000) : Math.round(execTimeRaw);
-      timePart = `${ms}ms`;
+    // elapsed_time_ms is in milliseconds; execution_time is in seconds
+    if (typeof result.elapsed_time_ms === "number") {
+      timePart = `${Math.round(result.elapsed_time_ms)}ms`;
+    } else if (typeof result.execution_time === "number") {
+      timePart = `${Math.round(result.execution_time * 1000)}ms`;
     }
     const parts = [`${green("\u2713")} ${bold("success")}`];
     if (timePart) parts.push(dim(timePart));

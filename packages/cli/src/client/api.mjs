@@ -45,7 +45,11 @@ async function requestJson(path, { method = "POST", query = {}, body, timeoutMs 
       throw err;
     }
 
-    return await response.json();
+    try {
+      return await response.json();
+    } catch {
+      throw new CliError("API_ERROR", "Invalid JSON response from API");
+    }
   } catch (err) {
     if (err instanceof CliError) throw err;
     if (err.name === "AbortError") throw new CliError("NET_TIMEOUT");

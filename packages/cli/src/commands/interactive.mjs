@@ -10,6 +10,9 @@ import { handleError } from "../errors/handler.mjs";
 export async function runInteractive(flags) {
   const apiKey = resolveApiKey(flags.apiKey);
   const baseUrl = flags.baseUrl;
+  const limit = parseInt(flags.limit, 10) || 5;
+  const discoverTimeout = (parseInt(flags.timeout, 10) || 30) * 1000;
+  const callTimeout = (parseInt(flags.timeout, 10) || 60) * 1000;
 
   const state = {
     discoveryId: null,
@@ -42,7 +45,7 @@ export async function runInteractive(flags) {
         case "search": {
           const query = rest.join(" ");
           if (!query) { console.log("  Usage: discover <query>"); break; }
-          const result = await discoverTools({ apiKey, baseUrl, query, limit: 5, timeoutMs: 30000 });
+          const result = await discoverTools({ apiKey, baseUrl, query, limit, timeoutMs: discoverTimeout });
           state.discoveryId = result.search_id;
           state.results = (result.results ?? []).map((t, i) => ({ index: i + 1, tool_id: t.tool_id, name: t.name }));
           console.log(formatDiscoverResult(result));
@@ -51,7 +54,7 @@ export async function runInteractive(flags) {
         case "inspect": {
           const toolId = resolveId(rest[0], state);
           if (!toolId) { console.log("  Usage: inspect <index|tool_id>"); break; }
-          const result = await inspectToolsByIds({ apiKey, baseUrl, toolIds: [toolId], discoveryId: state.discoveryId, timeoutMs: 30000 });
+          const result = await inspectToolsByIds({ apiKey, baseUrl, toolIds: [toolId], discoveryId: state.discoveryId, timeoutMs: discoverTimeout });
           console.log(formatInspectResult(result));
           break;
         }
@@ -61,7 +64,7 @@ export async function runInteractive(flags) {
           if (!state.discoveryId) { console.log("  Run 'discover' first."); break; }
           const paramsStr = rest.slice(1).join(" ") || "{}";
           const parameters = resolveParams(paramsStr);
-          const result = await callTool({ apiKey, baseUrl, toolId, discoveryId: state.discoveryId, parameters, timeoutMs: 120000 });
+          const result = await callTool({ apiKey, baseUrl, toolId, discoveryId: state.discoveryId, parameters, timeoutMs: callTimeout });
           console.log(formatCallResult(result));
           if (result.success) {
             state.lastCallContext = { toolId, discoveryId: state.discoveryId, parameters };

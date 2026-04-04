@@ -106,6 +106,16 @@ export async function main(argv) {
   }
 }
 
+function takeNext(args, i, flag) {
+  const next = args[i + 1];
+  if (next === undefined || next.startsWith("--")) {
+    console.error(`  Error: ${flag} requires a value`);
+    process.exitCode = 2;
+    return undefined;
+  }
+  return next;
+}
+
 function extractGlobalFlags(args) {
   const flags = { _positional: [] };
 
@@ -129,23 +139,23 @@ function extractGlobalFlags(args) {
       case "--clear":
         flags.clear = true; break;
       case "--api-key":
-        flags.apiKey = args[++i]; break;
+        flags.apiKey = takeNext(args, i++, arg); break;
       case "--base-url":
-        flags.baseUrl = args[++i]; break;
+        flags.baseUrl = takeNext(args, i++, arg); break;
       case "--timeout":
-        flags.timeout = args[++i]; break;
+        flags.timeout = takeNext(args, i++, arg); break;
       case "--limit":
-        flags.limit = args[++i]; break;
+        flags.limit = takeNext(args, i++, arg); break;
       case "--discovery-id":
-        flags.discoveryId = args[++i]; break;
+        flags.discoveryId = takeNext(args, i++, arg); break;
       case "--params":
-        flags.params = args[++i]; break;
+        flags.params = takeNext(args, i++, arg); break;
       case "--max-size":
-        flags.maxSize = args[++i]; break;
+        flags.maxSize = takeNext(args, i++, arg); break;
       case "--codegen":
-        flags.codegen = args[++i]; break;
+        flags.codegen = takeNext(args, i++, arg); break;
       case "--token":
-        flags.token = args[++i]; break;
+        flags.token = takeNext(args, i++, arg); break;
       default:
         flags._positional.push(arg);
     }

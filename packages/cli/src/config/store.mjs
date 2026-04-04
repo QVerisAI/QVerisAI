@@ -27,7 +27,7 @@ export function readConfig() {
 export function writeConfig(config) {
   const dir = configDir();
   mkdirSync(dir, { recursive: true });
-  writeFileSync(configPath(), JSON.stringify(config, null, 2) + "\n");
+  writeFileSync(configPath(), JSON.stringify(config, null, 2) + "\n", { mode: 0o600 });
 }
 
 export function getConfigValue(key) {

@@ -7,6 +7,9 @@ export function resolveParams(value) {
   let raw = value;
 
   if (value === "-") {
+    if (process.stdin.isTTY) {
+      throw new CliError("PARAMS_INVALID_JSON", "No data piped to stdin. Usage: echo '{...}' | qveris call ... --params -");
+    }
     try {
       // Use fd 0 (stdin) which works cross-platform (Linux, macOS, Windows)
       raw = readFileSync(0, "utf-8");
