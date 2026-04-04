@@ -132,6 +132,12 @@ function extractGlobalFlags(args) {
   for (let i = 0; i < args.length; i++) {
     let arg = args[i];
 
+    // -- signals end of options; everything after is positional
+    if (arg === "--") {
+      flags._positional.push(...args.slice(i + 1));
+      break;
+    }
+
     // Handle --key=value syntax
     if (arg.startsWith("--") && arg.includes("=")) {
       const eqIdx = arg.indexOf("=");

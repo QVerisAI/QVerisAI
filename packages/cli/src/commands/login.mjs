@@ -17,8 +17,18 @@ function openBrowser(url) {
 function prompt(question) {
   const rl = createInterface({ input: process.stdin, output: process.stderr });
   return new Promise((resolve) => {
-    rl.question(question, (answer) => {
+    process.stderr.write(question);
+    // Mask input — replace each character with * to prevent key from showing on screen
+    const oldWrite = rl.output.write;
+    rl.output.write = (data) => {
+      if (data === "\n" || data === "\r" || data === "\r\n") return oldWrite.call(rl.output, data);
+      if (data.length > 0) return oldWrite.call(rl.output, "*");
+      return true;
+    };
+    rl.question("", (answer) => {
+      rl.output.write = oldWrite;
       rl.close();
+      console.error(); // Move to next line
       resolve(answer.trim());
     });
   });

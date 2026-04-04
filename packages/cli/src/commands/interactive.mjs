@@ -4,6 +4,7 @@ import { discoverTools, inspectToolsByIds, callTool } from "../client/api.mjs";
 import { resolveParams } from "../utils/params.mjs";
 import { formatDiscoverResult, formatInspectResult, formatCallResult } from "../output/formatter.mjs";
 import { generateSnippet } from "../output/codegen.mjs";
+import { writeSession } from "../session/session.mjs";
 import { bold, dim, cyan } from "../output/colors.mjs";
 import { handleError } from "../errors/handler.mjs";
 import { createSpinner } from "../output/spinner.mjs";
@@ -36,6 +37,8 @@ export async function runInteractive(flags) {
     const input = line.trim();
     if (!input) { rl.prompt(); return; }
 
+    rl.pause(); // Prevent race conditions on rapid input
+
     const parts = parseArgs(input);
     const cmd = parts[0]?.toLowerCase();
     const rest = parts.slice(1);
@@ -50,7 +53,11 @@ export async function runInteractive(flags) {
           const result = await discoverTools({ apiKey, baseUrl, query, limit, timeoutMs: discoverTimeout });
           sp.stop();
           state.discoveryId = result.search_id;
-          state.results = (result.results ?? []).map((t, i) => ({ index: i + 1, tool_id: t.tool_id, name: t.name }));
+          state.results = (result.results ?? []).map((t, i) => ({
+            index: i + 1, tool_id: t.tool_id, name: t.name, provider_name: t.provider_name,
+          }));
+          // Persist session so index shortcuts work in subsequent non-interactive calls
+          writeSession({ discoveryId: result.search_id, query, results: state.results });
           console.log(formatDiscoverResult(result));
           break;
         }
@@ -105,9 +112,10 @@ export async function runInteractive(flags) {
       }
     } catch (err) {
       handleError(err, false);
+    } finally {
+      rl.resume();
+      rl.prompt();
     }
-
-    rl.prompt();
   });
 
   rl.on("close", () => {
