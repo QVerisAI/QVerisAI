@@ -30,6 +30,17 @@ function prompt(question) {
     }
 
     let buf = "";
+
+    const cleanup = () => {
+      process.stdin.removeListener("data", onData);
+      try { process.stdin.setRawMode(false); } catch { /* already restored */ }
+      process.stdin.pause();
+    };
+
+    // Safety net: restore terminal if process exits unexpectedly
+    const onExit = () => { try { process.stdin.setRawMode(false); } catch {} };
+    process.once("exit", onExit);
+
     process.stdin.setRawMode(true);
     process.stdin.resume();
     process.stdin.setEncoding("utf-8");
@@ -37,18 +48,16 @@ function prompt(question) {
     const onData = (key) => {
       // Ctrl+C
       if (key === "\x03") {
-        process.stdin.setRawMode(false);
-        process.stdin.pause();
-        process.stdin.removeListener("data", onData);
+        cleanup();
+        process.removeListener("exit", onExit);
         process.stderr.write("\n");
         reject(new Error("Aborted"));
         return;
       }
       // Enter
       if (key === "\r" || key === "\n") {
-        process.stdin.setRawMode(false);
-        process.stdin.pause();
-        process.stdin.removeListener("data", onData);
+        cleanup();
+        process.removeListener("exit", onExit);
         process.stderr.write("\n");
         resolve(buf.trim());
         return;
