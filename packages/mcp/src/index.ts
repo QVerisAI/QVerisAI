@@ -7,7 +7,7 @@
  * and execute third-party tools via natural language.
  *
  * @module @qverisai/mcp
- * @version 0.1.0
+ * @version Read from package.json at runtime
  *
  * @example
  * Configure in Claude Desktop or Cursor:
@@ -55,8 +55,11 @@ import type { ApiError } from './types.js';
 // Server Configuration
 // ============================================================================
 
+import { createRequire } from 'node:module';
+
 const SERVER_NAME = 'qveris';
-const SERVER_VERSION = '0.1.0';
+const require = createRequire(import.meta.url);
+const { version: SERVER_VERSION } = require('../package.json');
 
 /**
  * Main entry point for the Qveris MCP Server.
