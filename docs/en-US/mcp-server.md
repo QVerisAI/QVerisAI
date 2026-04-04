@@ -94,7 +94,7 @@ QVERIS_API_KEY=your-api-key
 
 For environment-specific setup guides, see:
 
-- [SETUP.md](../SETUP.md)
+- [SETUP.md](../../agent/SETUP.md)
 - [Claude Code setup](claude-code-setup.md)
 - [OpenCode setup](opencode-setup.md)
 - [IDE / CLI setup](ide-cli-setup.md)
@@ -270,5 +270,5 @@ If direct `npx` execution fails in some clients, wrap with `cmd /c`:
 
 - [Getting started](getting-started.md)
 - [REST API documentation](rest-api.md)
-- [Agent setup guide](../SETUP.md)
+- [Agent setup guide](../../agent/SETUP.md)
 - [MCP/client skill definition](../skills/qveris/SKILL.md)

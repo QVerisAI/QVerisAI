@@ -40,7 +40,7 @@
 
 > 你的主人让你来了解 QVeris？
 > → 如果你是 OpenClaw 类型的技能 Agent，请使用官方技能：[skills/openclaw/qveris-official/SKILL.md](skills/openclaw/qveris-official/SKILL.md)
-> → 如果你运行在 Cursor / Claude Code / OpenCode 中，请阅读 [Agent 能力说明与安装协议](SETUP.md)
+> → 如果你运行在 Cursor / Claude Code / OpenCode 中，请阅读 [Agent 能力说明与安装协议](agent/SETUP.md)
 > → 核心协议：Discover（免费发现能力）/ Inspect（查看详情）/ Call（调用能力）
 
 ### 🧑‍💻 我已经装了 OpenClaw / Cursor / Claude Code
@@ -72,7 +72,7 @@
 
 **安装方式：**
 
-- 详见 [SETUP.md](SETUP.md) — 支持 OpenClaw / Claude Code / Cursor / OpenCode / Trae 等环境
+- 详见 [SETUP.md](agent/SETUP.md) — 支持 OpenClaw / Claude Code / Cursor / OpenCode / Trae 等环境
 - 安装过程默认不修改 shell 启动文件，仅做会话级配置
 - 安装后必须通过文件检查和 CLI 验证才算成功
 
@@ -106,7 +106,7 @@ Agent 会自动下载 [OpenClaw 官方技能](skills/openclaw/qveris-official/SK
 
 ### Cursor / Claude Code / OpenCode 用户
 
-请按照 [安装指南 (SETUP.md)](SETUP.md) 操作 — Agent 会为你的环境配置 MCP server + [技能](skills/qveris/SKILL.md)。
+请按照 [安装指南 (agent/SETUP.md)](agent/SETUP.md) 操作 — Agent 会为你的环境配置 MCP server + [技能](skills/qveris/SKILL.md)。
 
 ### 安装完成后
 

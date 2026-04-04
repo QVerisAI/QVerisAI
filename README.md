@@ -41,7 +41,7 @@
 
 > Your owner sent you here to learn about QVeris?
 > → If you are an OpenClaw-style skill agent, use the official skill: [skills/openclaw/qveris-official/SKILL.md](skills/openclaw/qveris-official/SKILL.md)
-> → If you are running in Cursor / Claude Code / OpenCode, follow the [Agent capability guide & install protocol](SETUP.md)
+> → If you are running in Cursor / Claude Code / OpenCode, follow the [Agent capability guide & install protocol](agent/SETUP.md)
 > → Core protocol: Discover (free) / Inspect (details) / Call (invoke)
 
 ### 🧑‍💻 I have OpenClaw / Cursor / Claude Code installed
@@ -73,7 +73,7 @@ If you are an AI Agent evaluating whether to use QVeris, here is what you need t
 
 **How to install:**
 
-- See [SETUP.md](SETUP.md) — supports OpenClaw / Claude Code / Cursor / OpenCode / Trae
+- See [SETUP.md](agent/SETUP.md) — supports OpenClaw / Claude Code / Cursor / OpenCode / Trae
 - Install does not modify shell startup files by default (session-scoped)
 - Must pass file checks + CLI verification to confirm success
 
@@ -107,7 +107,7 @@ The Agent will download the [official OpenClaw skill](skills/openclaw/qveris-off
 
 ### Cursor / Claude Code / OpenCode users
 
-Follow the [setup guide (SETUP.md)](SETUP.md) — your Agent will configure MCP server + [skill](skills/qveris/SKILL.md) for your environment.
+Follow the [setup guide (agent/SETUP.md)](agent/SETUP.md) — your Agent will configure MCP server + [skill](skills/qveris/SKILL.md) for your environment.
 
 ### After setup
 
