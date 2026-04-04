@@ -94,7 +94,7 @@ export async function runWhoami(flags) {
 
   try {
     await discoverTools({ apiKey: key, query: "test", limit: 1, timeoutMs: 10000 });
-    console.error(`\r\x1b[K`);
+    process.stderr.write("\\r\\x1b[K");
     console.log(`\n  ${green("\u2713")} Authenticated`);
     console.log(`  Key:    ${bold(masked)}`);
     console.log(`  Source: ${dim(source)}`);
