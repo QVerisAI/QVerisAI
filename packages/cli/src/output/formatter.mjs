@@ -247,18 +247,18 @@ export function formatCallResult(result) {
 // ── helpers ───────────────────────────────────────────────────────────
 
 /** Format a JSON Schema into a compact readable tree. */
-function formatSchema(schema, indent = "") {
-  if (!schema || typeof schema !== "object") return `${indent}${dim("(unknown)")}`;
+function formatSchema(schema, indent = "", depth = 0) {
+  if (depth > 8 || !schema || typeof schema !== "object") return `${indent}${dim(schema?.type ?? "(unknown)")}`;
   const lines = [];
   if (schema.type === "object" && schema.properties) {
     for (const [key, val] of Object.entries(schema.properties)) {
       const type = val.type ?? "any";
       if (type === "array" && val.items?.properties) {
         lines.push(`${indent}${cyan(key)}: ${dim(type + " of")}`);
-        lines.push(formatSchema(val.items, indent + "  "));
+        lines.push(formatSchema(val.items, indent + "  ", depth + 1));
       } else if (type === "object" && val.properties) {
         lines.push(`${indent}${cyan(key)}: ${dim(type)}`);
-        lines.push(formatSchema(val, indent + "  "));
+        lines.push(formatSchema(val, indent + "  ", depth + 1));
       } else {
         lines.push(`${indent}${cyan(key)}: ${dim(type)}`);
       }

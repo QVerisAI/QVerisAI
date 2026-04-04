@@ -12,7 +12,9 @@ export function resolveParams(value) {
     }
     try {
       // Use fd 0 (stdin) which works cross-platform (Linux, macOS, Windows)
-      raw = readFileSync(0, "utf-8");
+      // Limit to 1MB to prevent excessive memory usage from large piped input
+      const MAX_STDIN = 1024 * 1024;
+      raw = readFileSync(0, "utf-8").slice(0, MAX_STDIN);
     } catch {
       throw new CliError("PARAMS_INVALID_JSON", "Failed to read from stdin");
     }
