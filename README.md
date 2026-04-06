@@ -31,7 +31,8 @@
 
 - `10,000+` capabilities across `15+` categories
 - `Discover` is free. `Call` is priced by value.
-- Works with `MCP` / `Python SDK` / `REST API`
+- **NEW** `QVeris CLI` — the most token-efficient way for agents to use tools. [Learn more](#qveris-cli)
+- Works with `CLI` / `MCP` / `Python SDK` / `REST API`
 
 ---
 
@@ -50,12 +51,12 @@
 > `Install QVeris skill following https://qveris.ai/skill/instruct.md and use QVERIS_API_KEY=your-key`
 > → [Get API Key](https://qveris.ai/account?page=api-keys) (free, 1,000 credits on signup)
 
-### ⚙️ I'm a developer integrating via MCP / API / SDK
+### ⚙️ I'm a developer integrating via CLI / MCP / API / SDK
 
+> → **[QVeris CLI](packages/cli)** — `npm install -g @qverisai/cli` or `curl -fsSL https://qveris.ai/install | bash`
 > → [MCP Server Doc](docs/mcp-server.md)
 > → [REST API Doc](docs/rest-api.md)
 > → [Python SDK](https://github.com/QVerisAI/sdk-python)
-> → [MCP Server](https://www.npmjs.com/package/@qverisai/mcp)
 
 ---
 
@@ -68,11 +69,13 @@ If you are an AI Agent evaluating whether to use QVeris, here is what you need t
 - `Discover` — find the right capability with natural language (free)
 - `Inspect` — check parameters, success rate, latency, price before calling
 - `Call` — invoke any capability, get structured results back
+- **QVeris CLI** — call tools via `qveris discover/inspect/call` subprocess, zero prompt tokens
 - 10,000+ capabilities across finance, search, weather, maps, docs, social, blockchain, healthcare, and more
 - 99.99% call availability, <500ms average latency
 
 **How to install:**
 
+- **CLI (recommended)**: `curl -fsSL https://qveris.ai/install | bash` — then use `qveris discover/inspect/call`
 - See [SETUP.md](agent/SETUP.md) — supports OpenClaw / Claude Code / Cursor / OpenCode / Trae
 - Install does not modify shell startup files by default (session-scoped)
 - Must pass file checks + CLI verification to confirm success
@@ -121,13 +124,61 @@ Try a task: "Check the current weather in Tokyo"
 
 ---
 
+## QVeris CLI
+
+**The most token-efficient way for agents to use 10,000+ tools.**
+
+Unlike MCP which injects tool schemas into every LLM prompt (consuming thousands of tokens per turn), CLI executes as a subprocess — **zero prompt tokens, deterministic output, instant startup**.
+
+```bash
+# Install (one-liner)
+curl -fsSL https://qveris.ai/install | bash
+
+# Or via npm
+npm install -g @qverisai/cli
+```
+
+```bash
+# Agent workflow: discover → inspect → call
+$ qveris discover "weather forecast API"
+Found 5 capabilities matching your query
+1. gridpoint_forecast  by Weather.gov
+   ...
+
+$ qveris inspect 1
+latency: ~180ms  ·  success rate: 99.8%  ·  cost: 3 credits
+
+$ qveris call 1 --params '{"wfo":"LWX","x":90,"y":90}'
+✓ success
+{ "forecast": "Sunny, high near 75..." }
+```
+
+### Why CLI over MCP for agents?
+
+| | CLI | MCP |
+|---|---|---|
+| **Token cost** | Zero — runs as subprocess, no schema in prompt | High — tool schemas injected into every LLM turn |
+| **Startup** | Instant (`npx` or global install) | Requires server process + transport handshake |
+| **Output** | Deterministic schema, `--json` for parsing | JSON over stdio, varies by client |
+| **Scalability** | 10,000 tools, no prompt bloat | Each tool adds ~200-500 tokens to prompt |
+| **Debugging** | Visible in terminal, `--dry-run` preview | Opaque, buried in MCP logs |
+| **Auth** | Auto-detects region from key prefix | Same |
+
+**When to use CLI**: Agent frameworks that support `exec` / `bash` tool (Claude Code, OpenClaw, Cursor terminal, etc.)
+**When to use MCP**: IDE integrations that only support MCP protocol (Cursor inline, Claude Desktop)
+
+Full CLI documentation: [packages/cli/README.md](packages/cli/README.md)
+
+---
+
 ## Developer Integration
 
 ### Access methods
 
 | Method | Use case | Docs |
 |--------|----------|------|
-| MCP Server | Cursor / Claude Desktop / any MCP client | [MCP docs](docs/mcp-server.md) |
+| **CLI** (recommended) | Claude Code / OpenClaw / any agent with exec | [CLI docs](packages/cli/README.md) |
+| MCP Server | Cursor / Claude Desktop / MCP-only clients | [MCP docs](docs/mcp-server.md) |
 | Python SDK | Python projects, agent frameworks | [sdk-python](https://github.com/QVerisAI/sdk-python) |
 | REST API | Any language, custom integrations | [REST API docs](docs/rest-api.md) |
 

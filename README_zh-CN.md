@@ -30,7 +30,8 @@
 
 - `10,000+` 能力 · `15+` 类目
 - `Discover / Inspect / Call` — 一个协议接入一切
-- 支持 `MCP` / `Python SDK` / `REST API`
+- **NEW** `QVeris CLI` — Agent 调用工具最省 token 的方式。[了解更多](#qveris-cli)
+- 支持 `CLI` / `MCP` / `Python SDK` / `REST API`
 
 ---
 
@@ -49,12 +50,12 @@
 > `Install QVeris skill following https://qveris.ai/skill/instruct.md and use QVERIS_API_KEY=你的key`
 > → [获取 API Key](https://qveris.ai/account?page=api-keys)（免费注册即得 1,000 credits）
 
-### ⚙️ 我是开发者，要通过 API / SDK 集成
+### ⚙️ 我是开发者，要通过 CLI / MCP / API / SDK 集成
 
+> → **[QVeris CLI](packages/cli)** — `npm install -g @qverisai/cli` 或 `curl -fsSL https://qveris.ai/install | bash`
 > → [MCP Server 文档](docs/mcp-server.md)
 > → [REST API 文档](docs/rest-api.md)
 > → [Python SDK](https://github.com/QVerisAI/sdk-python)
-> → [MCP Server](https://www.npmjs.com/package/@qverisai/mcp)
 
 ---
 
@@ -67,11 +68,13 @@
 - 通过 `Discover`（自然语言），即时发现 10,000+ 能力
 - 通过 `Inspect` 查看候选能力的参数、成功率、延迟等详情
 - 通过 `Call` 调用任意能力，获得结构化返回
+- **QVeris CLI** — 通过 `qveris discover/inspect/call` 子进程调用工具，零 prompt token 消耗
 - 覆盖金融、搜索、天气、地图、文档、社交、区块链、医疗等 15+ 类目
 - 99.99% 调用可达率，平均延迟 <500ms
 
 **安装方式：**
 
+- **CLI（推荐）**：`curl -fsSL https://qveris.ai/install | bash` — 然后直接用 `qveris discover/inspect/call`
 - 详见 [SETUP.md](agent/SETUP.md) — 支持 OpenClaw / Claude Code / Cursor / OpenCode / Trae 等环境
 - 安装过程默认不修改 shell 启动文件，仅做会话级配置
 - 安装后必须通过文件检查和 CLI 验证才算成功
@@ -120,13 +123,61 @@ Agent 会自动下载 [OpenClaw 官方技能](skills/openclaw/qveris-official/SK
 
 ---
 
+## QVeris CLI
+
+**Agent 调用工具最省 token 的方式。**
+
+MCP 会将工具 schema 注入每一轮 LLM prompt（每轮消耗数千 token），而 CLI 作为子进程执行 — **零 prompt token、确定性输出、即时启动**。
+
+```bash
+# 一键安装
+curl -fsSL https://qveris.ai/install | bash
+
+# 或通过 npm
+npm install -g @qverisai/cli
+```
+
+```bash
+# Agent 工作流：discover → inspect → call
+$ qveris discover "weather forecast API"
+Found 5 capabilities matching your query
+1. gridpoint_forecast  by Weather.gov
+   ...
+
+$ qveris inspect 1
+latency: ~180ms  ·  success rate: 99.8%  ·  cost: 3 credits
+
+$ qveris call 1 --params '{"wfo":"LWX","x":90,"y":90}'
+✓ success
+{ "forecast": "Sunny, high near 75..." }
+```
+
+### CLI vs MCP：为什么 Agent 应该优先用 CLI？
+
+| | CLI | MCP |
+|---|---|---|
+| **Token 消耗** | 零 — 子进程执行，不占用 prompt | 高 — 工具 schema 注入每轮 LLM 调用 |
+| **启动速度** | 即时（`npx` 或全局安装） | 需要启动 server + 传输协商 |
+| **输出格式** | 确定性 schema，`--json` 可直接解析 | JSON over stdio，因客户端而异 |
+| **可扩展性** | 10,000 工具，不会撑大 prompt | 每个工具增加 ~200-500 token |
+| **调试** | 终端可见，`--dry-run` 预览 | 不透明，埋在 MCP 日志里 |
+| **认证** | 从 key 前缀自动检测 region | 相同 |
+
+**何时用 CLI**：支持 `exec` / `bash` 工具的 Agent 框架（Claude Code、OpenClaw、Cursor terminal 等）
+**何时用 MCP**：仅支持 MCP 协议的 IDE 集成（Cursor inline、Claude Desktop）
+
+完整 CLI 文档：[packages/cli/README.md](packages/cli/README.md)
+
+---
+
 ## 开发者集成
 
 ### 接入方式
 
 | 方式 | 适用场景 | 文档 |
 |------|---------|------|
-| MCP Server | Cursor / Claude Desktop / 任何 MCP 客户端 | [MCP 文档](docs/mcp-server.md) |
+| **CLI**（推荐） | Claude Code / OpenClaw / 任何支持 exec 的 Agent | [CLI 文档](packages/cli/README.md) |
+| MCP Server | Cursor / Claude Desktop / 仅支持 MCP 的客户端 | [MCP 文档](docs/mcp-server.md) |
 | Python SDK | Python 项目、Agent 框架 | [sdk-python](https://github.com/QVerisAI/sdk-python) |
 | REST API | 任何语言、自定义集成 | [REST API 文档](docs/rest-api.md) |
 

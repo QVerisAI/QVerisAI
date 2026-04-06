@@ -118,6 +118,33 @@ QVeris supports three integration methods:
 | **Python SDK** | Python projects, Agent frameworks | https://github.com/QVerisAI/sdk-python |
 | **REST API** | Any language, Custom integrations | https://github.com/QVerisAI/QVerisAI/blob/main/docs/rest-api.md |
 
+### QVeris CLI — Token-Efficient Agent Tool Use (Recommended)
+
+The CLI is the most efficient way for agents to access QVeris capabilities. Unlike MCP which injects tool schemas into every LLM prompt, CLI runs as a subprocess — zero prompt tokens consumed.
+
+```bash
+# Install
+curl -fsSL https://qveris.ai/install | bash
+# or: npm install -g @qverisai/cli
+
+# Agent workflow
+qveris discover "weather forecast API"     # Find tools (free)
+qveris inspect 1                            # Check params, stats
+qveris call 1 --params '{"city":"London"}'  # Execute (1-100 credits)
+```
+
+**Why CLI over MCP for agents:**
+- **Zero token cost** — runs as subprocess, tool schemas never enter the prompt
+- **Scales to 10,000+ tools** — no prompt bloat regardless of tool count
+- **Deterministic output** — same command always produces same schema
+- **`--json` mode** — structured output for programmatic parsing
+- **Smart truncation** — large results auto-truncate with OSS download link
+
+**Use CLI when:** Agent framework supports `exec` / `bash` (Claude Code, OpenClaw, Cursor terminal)
+**Use MCP when:** IDE only supports MCP protocol (Cursor inline, Claude Desktop)
+
+Full CLI docs: https://github.com/QVerisAI/QVerisAI/blob/main/packages/cli/README.md
+
 ### MCP Server Quick Start
 
 ```bash
