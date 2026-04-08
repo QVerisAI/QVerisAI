@@ -7,8 +7,8 @@ import { createSpinner } from "../output/spinner.mjs";
 
 export async function runCredits(flags) {
   const apiKey = resolveApiKey(flags.apiKey);
-  const { region } = resolveBaseUrl({ baseUrlFlag: flags.baseUrl, apiKey });
-  const accountUrl = `${getSiteUrl(region)}/account`;
+  const { region, baseUrl } = resolveBaseUrl({ baseUrlFlag: flags.baseUrl, apiKey });
+  const accountUrl = `${getSiteUrl(region, baseUrl)}/account`;
 
   const spinner = flags.json ? { stop() {} } : createSpinner("Checking credits...");
 

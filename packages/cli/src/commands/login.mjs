@@ -142,8 +142,9 @@ export async function runLogin(flags) {
   }
 
   // Determine region: if already set via flag/env, use that; otherwise ask the user.
-  const { region: presetRegion, source: regionSource } = resolveBaseUrl({ baseUrlFlag: flags.baseUrl });
+  const { region: presetRegion, baseUrl: presetBaseUrl, source: regionSource } = resolveBaseUrl({ baseUrlFlag: flags.baseUrl });
   let region;
+  let baseUrl = presetBaseUrl;
   if (regionSource !== "default") {
     // Region explicitly configured — use it directly
     region = presetRegion;
@@ -158,7 +159,7 @@ export async function runLogin(flags) {
     region = choice === "2" ? "cn" : "global";
   }
 
-  const accountUrl = `${getSiteUrl(region)}/account?page=api-keys`;
+  const accountUrl = `${getSiteUrl(region, baseUrl)}/account?page=api-keys`;
   console.log(`\n  Get your API key at: ${cyan(accountUrl)}\n`);
 
   if (!flags.noBrowser) {

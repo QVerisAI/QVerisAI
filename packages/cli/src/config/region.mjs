@@ -20,10 +20,16 @@ const SITE_URLS = {
 
 /**
  * Get the site URL (not API URL) for a given region.
+ * For custom regions, attempts to infer from the base URL domain.
  * @param {string} region
+ * @param {string} [baseUrl] - The resolved API base URL (used to infer site for custom regions)
  * @returns {string}
  */
-export function getSiteUrl(region) {
+export function getSiteUrl(region, baseUrl) {
+  if (region === "custom" && baseUrl) {
+    if (baseUrl.includes("qveris.cn")) return SITE_URLS.cn;
+    if (baseUrl.includes("qveris.ai")) return SITE_URLS.global;
+  }
   return SITE_URLS[region] || SITE_URLS.global;
 }
 

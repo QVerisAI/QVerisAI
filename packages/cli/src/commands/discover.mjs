@@ -26,11 +26,12 @@ export async function runDiscover(query, flags) {
 
     // Store richer session data for index resolution
     const tools = result.results ?? [];
-    const { region } = resolveBaseUrl({ baseUrlFlag: flags.baseUrl, apiKey });
+    const { region, baseUrl: resolvedBaseUrl } = resolveBaseUrl({ baseUrlFlag: flags.baseUrl, apiKey });
     writeSession({
       discoveryId: result.search_id,
       query,
       region,
+      baseUrl: resolvedBaseUrl,
       results: tools.map((t, i) => ({
         index: i + 1,
         tool_id: t.tool_id,
