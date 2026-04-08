@@ -104,9 +104,9 @@ qveris call 1 --params '{"wfo": "LWX", "x": 90, "y": 90}'
 
 | Command | Description |
 |---------|-------------|
-| `qveris login` | Authenticate with API key (opens browser or `--token` for direct input) |
+| `qveris login` | Authenticate with API key (interactive region selection, opens browser, or `--token` for direct input) |
 | `qveris logout` | Remove stored key |
-| `qveris whoami` | Show current auth status and key source |
+| `qveris whoami` | Show current auth status, key source, and region |
 | `qveris credits` | Check credit balance |
 
 ### Utilities
@@ -114,7 +114,7 @@ qveris call 1 --params '{"wfo": "LWX", "x": 90, "y": 90}'
 | Command | Description |
 |---------|-------------|
 | `qveris interactive` | Launch REPL mode (discover/inspect/call/codegen in one session) |
-| `qveris doctor` | Self-check: Node.js version, API key, connectivity |
+| `qveris doctor` | Self-check: Node.js version, API key, region, connectivity |
 | `qveris config <subcommand>` | Manage CLI settings (set, get, list, reset, path) |
 | `qveris completions <shell>` | Generate shell completions (bash/zsh/fish) |
 
@@ -251,13 +251,18 @@ The API region is auto-detected from your key prefix:
 | `sk-xxx` | Global | `https://qveris.ai/api/v1` |
 | `sk-cn-xxx` | China | `https://qveris.cn/api/v1` |
 
-No extra configuration needed. To override manually:
+No extra configuration needed. `qveris login` prompts for region selection interactively on first use.
+
+**Agent / script usage:** Use `--token` with a region-prefixed key, or set environment variables:
 
 ```bash
-# Via environment variable
+# Key prefix auto-detection (recommended)
+qveris login --token "sk-cn-xxx"
+
+# Or environment variable
 export QVERIS_REGION=cn
 
-# Or set a custom base URL
+# Or custom base URL
 export QVERIS_BASE_URL=https://custom.endpoint/api/v1
 
 # Or per-command
