@@ -27,7 +27,6 @@ export async function runDiscover(query, flags) {
 
     // Store richer session data for index resolution
     const tools = result.results ?? [];
-    const { region, baseUrl: resolvedBaseUrl } = resolveBaseUrl({ baseUrlFlag: flags.baseUrl, apiKey });
     writeSession({
       discoveryId: result.search_id,
       query,
