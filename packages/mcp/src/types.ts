@@ -79,7 +79,7 @@ export interface ToolStats {
  * Contains everything needed to understand and execute the tool.
  */
 export interface ToolInfo {
-  /** Unique identifier for the tool (used in execute_tool) */
+  /** Unique identifier for the tool (used in call) */
   tool_id: string;
 
   /** Human-readable display name */
@@ -156,7 +156,7 @@ export interface SearchResponse {
 
   /**
    * Unique identifier for this search.
-   * Required when calling execute_tool for any tool from these results.
+   * Required when calling call for any tool from these results.
    */
   search_id: string;
 
