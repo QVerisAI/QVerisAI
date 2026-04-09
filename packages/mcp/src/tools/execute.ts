@@ -1,8 +1,8 @@
 /**
- * execute_tool MCP Tool Implementation
+ * call MCP Tool Implementation (formerly execute_tool)
  *
  * Executes a specific remote tool with provided parameters.
- * The tool_id must come from a previous search_tools call.
+ * The tool_id must come from a previous discover call.
  *
  * @module tools/execute
  */
@@ -11,17 +11,17 @@ import type { QverisClient } from '../api/client.js';
 import type { ExecuteResponse } from '../types.js';
 
 /**
- * Input parameters for the execute_tool tool.
+ * Input parameters for the call tool.
  */
 export interface ExecuteToolInput {
   /**
    * The ID of the remote tool to execute.
-   * Must be obtained from search_tools results.
+   * Must be obtained from discover results.
    */
   tool_id: string;
 
   /**
-   * The search_id from the search_tools response that returned this tool.
+   * The search_id from the discover response that returned this tool.
    * Links the execution to the original search for analytics and billing.
    */
   search_id: string;
@@ -63,13 +63,13 @@ export const executeToolSchema = {
     tool_id: {
       type: 'string',
       description:
-        'The ID of the remote tool to execute. Must come from a previous search_tools call.',
+        'The ID of the remote tool to execute. Must come from a previous discover call.',
     },
     search_id: {
       type: 'string',
       description:
-        'The search_id from the search_tools response that returned this tool. ' +
-        'Required for linking execution to the original search.',
+        'The search_id from the discover response that returned this tool. ' +
+        'Required for linking execution to the original discovery.',
     },
     params_to_tool: {
       type: 'object',

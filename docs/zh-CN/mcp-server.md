@@ -6,9 +6,9 @@
 
 它通过三个 MCP 工具为 Agent 提供 QVeris 访问能力：
 
-- `search_tools` = **发现（Discover）**
-- `get_tools_by_ids` = **检查（Inspect）**
-- `execute_tool` = **调用（Call）**
+- `discover` — 用自然语言发现能力
+- `inspect` — 获取工具详情（参数、成功率、示例）
+- `call` — 执行工具并传入参数
 
 换言之，MCP 服务器是本仓库其他文档所描述的 QVeris 核心协议的 Agent 侧传输层。
 
@@ -32,9 +32,11 @@
 
 | 协议操作 | MCP 工具 | REST API |
 |---------|---------|---------|
-| **发现** | `search_tools` | `POST /search` |
-| **检查** | `get_tools_by_ids` | `POST /tools/by-ids` |
-| **调用** | `execute_tool` | `POST /tools/execute` |
+| **发现** | `discover` | `POST /search` |
+| **检查** | `inspect` | `POST /tools/by-ids` |
+| **调用** | `call` | `POST /tools/execute` |
+
+> **注意：** 旧工具名称（`search_tools`、`get_tools_by_ids`、`execute_tool`）仍作为弃用别名支持。
 
 ---
 
@@ -54,11 +56,15 @@
 npx -y @qverisai/mcp
 ```
 
-MCP 服务器从以下环境变量读取 API 密钥：
+MCP 服务器从以下环境变量读取配置：
 
 ```bash
-QVERIS_API_KEY=your-api-key
+QVERIS_API_KEY=your-api-key          # 必填
+QVERIS_REGION=cn                      # 可选：强制区域（global | cn）
+QVERIS_BASE_URL=https://...          # 可选：覆盖 API 地址
 ```
+
+区域从 API key 前缀自动检测（`sk-cn-xxx` → 中国区，`sk-xxx` → 全球）。仅在需要覆盖时设置 `QVERIS_REGION`。
 
 ### Claude Desktop 配置示例
 
@@ -92,6 +98,25 @@ QVERIS_API_KEY=your-api-key
 }
 ```
 
+### 中国区配置示例
+
+中国大陆用户可添加 `QVERIS_REGION` 或使用 `sk-cn-` 前缀的 key：
+
+```json
+{
+  "mcpServers": {
+    "qveris": {
+      "command": "npx",
+      "args": ["-y", "@qverisai/mcp"],
+      "env": {
+        "QVERIS_API_KEY": "sk-cn-your-api-key-here",
+        "QVERIS_REGION": "cn"
+      }
+    }
+  }
+}
+```
+
 各环境的详细配置指南，请参考：
 
 - [Agent 安装指南](../../agent/SETUP.md)
@@ -103,7 +128,7 @@ QVERIS_API_KEY=your-api-key
 
 ## 可用 MCP 工具
 
-### 1. `search_tools`
+### 1. `discover`
 
 使用自然语言发现能力。
 
@@ -136,7 +161,7 @@ QVERIS_API_KEY=your-api-key
 
 ---
 
-### 2. `get_tools_by_ids`
+### 2. `inspect`
 
 在复用或调用之前，检查一个或多个已知 `tool_id` 的详情。
 
@@ -157,7 +182,7 @@ QVERIS_API_KEY=your-api-key
 }
 ```
 
-以下情况建议使用 `get_tools_by_ids`：
+以下情况建议使用 `inspect`：
 
 - 多个候选能力看起来类似
 - 调用前想重新确认参数
@@ -168,7 +193,7 @@ QVERIS_API_KEY=your-api-key
 
 ---
 
-### 3. `execute_tool`
+### 3. `call`
 
 调用已发现的 QVeris 能力。
 
@@ -213,9 +238,9 @@ QVERIS_API_KEY=your-api-key
 
 对于大多数 Agent 任务，建议使用以下流程：
 
-1. `search_tools` — 发现相关能力
-2. `get_tools_by_ids` — 在需要时检查最佳候选
-3. `execute_tool` — 调用所选能力
+1. `discover` — 发现相关能力
+2. `inspect` — 在需要时检查最佳候选
+3. `call` — 调用所选能力
 
 实践中：
 

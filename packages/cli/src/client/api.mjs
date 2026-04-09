@@ -36,7 +36,12 @@ async function requestJson(path, { method = "POST", query = {}, body, timeoutMs 
         errorDetail = jsonBody.error_message || jsonBody.message || null;
       } catch { /* not JSON */ }
       if (status === 401 || status === 403) throw new CliError("AUTH_INVALID_KEY", errorDetail);
-      if (status === 402) throw new CliError("CREDITS_INSUFFICIENT", errorDetail);
+      if (status === 402) {
+        const pricingHost = baseUrl.includes("qveris.cn") ? "https://qveris.cn" : "https://qveris.ai";
+        const err = new CliError("CREDITS_INSUFFICIENT", errorDetail);
+        err.hint = `Purchase credits at ${pricingHost}/pricing`;
+        throw err;
+      }
       if (status === 429) throw new CliError("RATE_LIMITED", errorDetail);
       const err = new CliError("API_ERROR", `HTTP ${status}: ${errorDetail || rawText}`);
       if (jsonBody) err.responseData = jsonBody;
