@@ -131,7 +131,8 @@ export class QverisClient {
 
         // Provide actionable hints for specific status codes
         if (status === 402) {
-          errorMessage = `Insufficient credits. ${errorMessage}. Purchase credits at https://qveris.ai/pricing`;
+          const pricingHost = this.baseUrl.includes('qveris.cn') ? 'https://qveris.cn' : 'https://qveris.ai';
+          errorMessage = `Insufficient credits. ${errorMessage}. Purchase credits at ${pricingHost}/pricing`;
         }
 
         const error: ApiError = {

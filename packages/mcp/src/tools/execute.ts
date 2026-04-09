@@ -16,12 +16,12 @@ import type { ExecuteResponse } from '../types.js';
 export interface ExecuteToolInput {
   /**
    * The ID of the remote tool to execute.
-   * Must be obtained from search_tools results.
+   * Must be obtained from discover results.
    */
   tool_id: string;
 
   /**
-   * The search_id from the search_tools response that returned this tool.
+   * The search_id from the discover response that returned this tool.
    * Links the execution to the original search for analytics and billing.
    */
   search_id: string;

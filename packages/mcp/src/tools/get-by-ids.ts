@@ -17,14 +17,14 @@ import type { SearchResponse } from '../types.js';
 export interface GetToolsByIdsInput {
   /**
    * Array of tool IDs to retrieve information for.
-   * Must be obtained from previous search_tools results.
+   * Must be obtained from previous discover results.
    *
    * @example ["weather-tool-1", "email-tool-2"]
    */
   tool_ids: string[];
 
   /**
-   * The search_id from the search_tools response that returned the tool(s).
+   * The search_id from the discover response that returned the tool(s).
    * Optional but recommended for analytics and billing.
    */
   search_id?: string;
