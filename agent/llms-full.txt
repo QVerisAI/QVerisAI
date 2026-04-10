@@ -168,7 +168,7 @@ qveris call 1 --params '{"city":"London"}' --codegen curl
 | `--codegen <curl\|js\|python>` | Generate code snippets after call |
 | `--params <json\|@file\|->` | Parameters as inline JSON, file path, or stdin |
 | `--limit <n>` | Result limit for discover (default: 5) |
-| `--max-size <bytes>` | Response size limit (-1 = unlimited) |
+| `--max-size <bytes>` | Response size limit; -1 for unlimited (default: 4KB TTY, 20KB non-TTY). MCP default is 20KB. |
 | `--verbose, -v` | Show request details |
 
 **Session & Index Shortcuts:**
