@@ -239,9 +239,11 @@ For Claude Desktop users, add to `claude_desktop_config.json`:
 
 **MCP Tool Parameters:**
 
-- **`discover`**: `query` (string, required), `limit` (number, 1-100, default 20 via MCP / 5 via CLI), `session_id` (string, optional)
+- **`discover`**: `query` (string, required), `limit` (number, 1-100, default 20), `session_id` (string, optional)
 - **`inspect`**: `tool_ids` (string[], required), `search_id` (string, optional), `session_id` (string, optional)
 - **`call`**: `tool_id` (string, required), `search_id` (string, required), `params_to_tool` (object|string, required), `session_id` (string, optional), `max_response_size` (number, optional, default 20480)
+
+> **Parameter naming:** The MCP `call` tool uses `params_to_tool` for tool arguments, while the REST API uses `parameters` and the CLI uses `--params`. The field names differ across interfaces but serve the same purpose.
 
 ### REST API Quick Reference
 
