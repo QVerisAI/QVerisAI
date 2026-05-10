@@ -137,6 +137,28 @@ class Agent:
     async def __aexit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
         await self.close()
 
+    @staticmethod
+    def _llm_error_event(error: Exception) -> StreamEvent:
+        """Convert provider/client exceptions into user-facing agent error events."""
+        if isinstance(error, httpx.TimeoutException):
+            return StreamEvent(type="error", error=f"LLM request timed out: {error}")
+        if isinstance(error, httpx.ConnectError):
+            return StreamEvent(type="error", error=f"Failed to connect to LLM service: {error}")
+        if isinstance(error, httpx.HTTPStatusError):
+            return StreamEvent(
+                type="error",
+                error=f"LLM HTTP error {error.response.status_code}: {error.response.text[:200]}"
+            )
+        if isinstance(error, AuthenticationError):
+            return StreamEvent(type="error", error=f"LLM authentication failed: {error}")
+        if isinstance(error, RateLimitError):
+            return StreamEvent(type="error", error=f"LLM rate limit exceeded: {error}")
+        if isinstance(error, (APIConnectionError, APITimeoutError)):
+            return StreamEvent(type="error", error=f"LLM connection error: {error}")
+        if isinstance(error, APIStatusError):
+            return StreamEvent(type="error", error=f"LLM API error {error.status_code}: {error}")
+        return StreamEvent(type="error", error=f"LLM error: {error}")
+
     async def run(
         self,
         messages: List[Message],
@@ -240,29 +262,8 @@ class Agent:
                     if response.metrics:
                         yield StreamEvent(type="metrics", metrics=response.metrics)
 
-            except httpx.TimeoutException as e:
-                yield StreamEvent(type="error", error=f"LLM request timed out: {e}")
-                return
-            except httpx.ConnectError as e:
-                yield StreamEvent(type="error", error=f"Failed to connect to LLM service: {e}")
-                return
-            except httpx.HTTPStatusError as e:
-                yield StreamEvent(type="error", error=f"LLM HTTP error {e.response.status_code}: {e.response.text[:200]}")
-                return
-            except AuthenticationError as e:
-                yield StreamEvent(type="error", error=f"LLM authentication failed: {e}")
-                return
-            except RateLimitError as e:
-                yield StreamEvent(type="error", error=f"LLM rate limit exceeded: {e}")
-                return
-            except (APIConnectionError, APITimeoutError) as e:
-                yield StreamEvent(type="error", error=f"LLM connection error: {e}")
-                return
-            except APIStatusError as e:
-                yield StreamEvent(type="error", error=f"LLM API error {e.status_code}: {e}")
-                return
             except Exception as e:
-                yield StreamEvent(type="error", error=f"LLM error: {e}")
+                yield self._llm_error_event(e)
                 return
 
             # Handle tool calls
