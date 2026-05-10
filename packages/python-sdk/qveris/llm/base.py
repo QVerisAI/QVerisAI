@@ -64,8 +64,8 @@ class LLMProvider(Protocol):
     - **eventful**: in streaming mode, yield `StreamEvent`s (content/tool_call/metrics...)
     """
     async def chat_stream(
-        self, 
-        messages: List[Message], 
+        self,
+        messages: List[Message],
         tools: List[ChatCompletionToolParam],
         config: AgentConfig
     ) -> AsyncGenerator[StreamEvent, None]:
@@ -102,4 +102,3 @@ class LLMProvider(Protocol):
         - `ChatResponse.reasoning_details`: optional provider-specific data
         """
         ...
-

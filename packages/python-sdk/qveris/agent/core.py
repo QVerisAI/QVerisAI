@@ -93,21 +93,21 @@ class Agent:
     ):
         self.config = config or QverisConfig()
         self.agent_config = agent_config or AgentConfig()
-        
+
         # Setup API Client with debug callback
         self.client = QverisClient(self.config, debug_callback=debug_callback)
-        
+
         # Setup LLM Provider
         if llm_provider:
             self.llm = llm_provider
         else:
             # Fallback to internal OpenAI provider
             self.llm = OpenAIProvider()
-            
+
         self.tools: List[ChatCompletionToolParam] = [SEARCH_TOOL_DEF, EXECUTE_TOOL_DEF]
         if extra_tools:
             self.tools.extend(extra_tools)
-        
+
         # Handler for extra tools not built into Qveris
         self.extra_tool_handler = extra_tool_handler
 
@@ -115,7 +115,7 @@ class Agent:
         self.new_session()
 
     async def run(
-        self, 
+        self,
         messages: List[Message],
         stream: bool = True
     ) -> AsyncGenerator[StreamEvent, None]:
@@ -127,34 +127,34 @@ class Agent:
         yields a single `content` event for the assistant message.
 
         Tool calls are always surfaced as `tool_call` events, and tool executions as `tool_result`.
-        
+
         Args:
             messages: Conversation history (typically starts with `role="user"`).
             stream: If True, yields content as delta chunks (streaming).
                     If False, yields content as complete text (non-streaming).
-        
+
         Yields:
             StreamEvent objects for content, reasoning, reasoning_details, tool_call, tool_result,
             metrics, and error.
         """
         # 1. Setup Messages
         current_messages = [m.model_copy() for m in messages]
-        
+
         # Add System Prompt
         system_prompt = DEFAULT_SYSTEM_PROMPT
         if self.agent_config.additional_system_prompt:
             system_prompt += '\n' + self.agent_config.additional_system_prompt
-        
+
         if not current_messages or current_messages[0].role != "system":
             current_messages.insert(0, Message(role="system", content=system_prompt))
-        
+
         iteration = 0
         should_continue = True
         previous_messages_count = len(current_messages)
-        
+
         while should_continue and iteration < self.config.max_iterations:
             iteration += 1
-            
+
             # Prune history to save tokens if enabled
             messages_to_send = current_messages
             if self.config.enable_history_pruning:
@@ -164,7 +164,7 @@ class Agent:
             tool_calls: List[Dict[str, Any]] = []
             content_accumulated = ""
             reasoning_details_accumulated = []
-            
+
             try:
                 if stream:
                     # Streaming mode: yield delta chunks
@@ -173,7 +173,7 @@ class Agent:
                         tools=self.tools,
                         config=self.agent_config
                     )
-                    
+
                     async for event in llm_stream:
                         if event.type in ["content", "reasoning"]:
                             yield event
@@ -196,27 +196,27 @@ class Agent:
                         tools=self.tools,
                         config=self.agent_config
                     )
-                    
+
                     # Yield complete content as single event
                     if response.content:
                         content_accumulated = response.content
                         yield StreamEvent(type="content", content=response.content)
-                    
+
                     # Capture reasoning_details for Gemini thought signatures
                     if response.reasoning_details:
                         reasoning_details_accumulated = response.reasoning_details
                         yield StreamEvent(type="reasoning_details", details=response.reasoning_details)
-                    
+
                     # Yield tool calls
                     if response.tool_calls:
                         for tc in response.tool_calls:
                             tool_calls.append(tc)
                             yield StreamEvent(type="tool_call", tool_call=tc)
-                    
+
                     # Yield metrics
                     if response.metrics:
                         yield StreamEvent(type="metrics", metrics=response.metrics)
-                        
+
             except httpx.TimeoutException as e:
                 yield StreamEvent(type="error", error=f"LLM request timed out: {e}")
                 return
@@ -247,12 +247,12 @@ class Agent:
                     # Preserve reasoning_details for Gemini thought signatures
                     reasoning_details=reasoning_details_accumulated if reasoning_details_accumulated else None
                 ))
-                
+
                 for tc in tool_calls:
                     func_name = tc["function"]["name"]
                     func_args_str = tc["function"]["arguments"]
                     call_id = tc["id"]
-                    
+
                     try:
                         func_args = json.loads(func_args_str)
                     except json.JSONDecodeError:
@@ -280,7 +280,7 @@ class Agent:
                         func_args=func_args,
                         session_id=self.session_id
                     )
-                    
+
                     # Handle extra tools if not a built-in Qveris tool
                     if not handled:
                         if self.extra_tool_handler:
@@ -313,7 +313,7 @@ class Agent:
                     ))
 
                 continue
-            
+
             else:
                 should_continue = False
 
@@ -329,7 +329,7 @@ class Agent:
             if event.type == "content":
                 content += event.content or ""
         return content
-    
+
     def new_session(self) -> str:
         """
         Create and set a new session id.

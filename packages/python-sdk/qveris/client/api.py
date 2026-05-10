@@ -41,14 +41,14 @@ class QverisClient:
         }
         if self.config.api_key:
             self.headers["Authorization"] = f"Bearer {self.config.api_key}"
-            
+
         # httpx automatically respects HTTP_PROXY/HTTPS_PROXY env vars
         self.client = httpx.AsyncClient(
             base_url=self.config.base_url,
             headers=self.headers,
             timeout=60.0
         )
-        
+
     def _debug(self, message: str):
         """Print debug message if callback is set"""
         if self.debug_callback:
@@ -83,26 +83,26 @@ class QverisClient:
 
         if session_id:
             payload["session_id"] = session_id
-        
+
         self._debug(f"[Qveris API] POST {url}")
         self._debug(f"[Qveris API] Request body: {json.dumps(payload, indent=2)}")
         self._debug(f"[Qveris API] Headers: {json.dumps({k: v if k != 'Authorization' else 'Bearer ***' for k, v in self.headers.items()}, indent=2)}")
-        
+
         response = await self.client.post("/search", json=payload)
-        
+
         self._debug(f"[Qveris API] Response status: {response.status_code}")
         try:
             response_json = response.json()
             self._debug(f"[Qveris API] Response body: {json.dumps(response_json, indent=2)}")
         except:
             self._debug(f"[Qveris API] Response body (raw): {response.text[:500]}")
-        
+
         response.raise_for_status()
         return SearchResponse(**response.json())
 
     async def execute_tool(
-        self, 
-        tool_id: str, 
+        self,
+        tool_id: str,
         parameters: Dict[str, Any],
         search_id: Optional[str] = None,
         session_id: Optional[str] = None,
@@ -125,7 +125,7 @@ class QverisClient:
         payload = {
             "parameters": parameters
         }
-        
+
         if search_id:
             payload["search_id"] = search_id
 
@@ -138,20 +138,20 @@ class QverisClient:
         self._debug(f"[Qveris API] POST {url}")
         self._debug(f"[Qveris API] Request body: {json.dumps(payload, indent=2)}")
         self._debug(f"[Qveris API] Headers: {json.dumps({k: v if k != 'Authorization' else 'Bearer ***' for k, v in self.headers.items()}, indent=2)}")
-        
+
         response = await self.client.post(
             "/tools/execute",
             params={"tool_id": tool_id},
             json=payload
         )
-        
+
         self._debug(f"[Qveris API] Response status: {response.status_code}")
         try:
             response_json = response.json()
             self._debug(f"[Qveris API] Response body: {json.dumps(response_json, indent=2)}")
         except:
             self._debug(f"[Qveris API] Response body (raw): {response.text[:500]}")
-        
+
         response.raise_for_status()
         return ToolExecutionResponse(**response.json())
 
@@ -163,12 +163,12 @@ class QverisClient:
     ) -> Tuple[Any, bool, bool]:
         """
         Handle a built-in Qveris tool (search_tools, execute_tool) call from an LLM response.
-        
+
         Args:
             func_name: The name of the function/tool to call
             func_args: The arguments parsed from the LLM response
             session_id: Optional session ID for tracking
-        
+
         Returns:
             Tuple of (result, is_error, handled) where:
             - result: the tool output (None if not handled)
@@ -189,14 +189,14 @@ class QverisClient:
                     session_id=session_id
                 )
                 return result.model_dump(), False, True
-                
+
             elif func_name == "execute_tool":
                 params_str = func_args.get("params_to_tool")
                 try:
                     params = json.loads(params_str) if params_str else {}
                 except (json.JSONDecodeError, TypeError):
                     params = {}
-                    
+
                 result = await self.execute_tool(
                     tool_id=func_args.get("tool_id"),
                     parameters=params,
@@ -205,11 +205,11 @@ class QverisClient:
                     max_response_size=func_args.get("max_response_size")
                 )
                 return result.model_dump(), False, True
-                
+
             else:
                 # Not a Qveris tool
                 return None, False, False
-                
+
         except httpx.HTTPStatusError as e:
             return {"error": f"HTTP {e.response.status_code}: {e.response.text[:500]}"}, True, True
         except Exception as e:

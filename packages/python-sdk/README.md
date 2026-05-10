@@ -140,5 +140,3 @@ agent = Agent(llm_provider=MyProvider())
 - **Smart Context**: Automatically prunes old tool results to save tokens (`enable_history_pruning=True`).
 - **Multiple Agents**: Configure different agents with unique system prompts and temperatures.
 - **Reasoning Support**: Captures reasoning traces from models like Gemini (via OpenRouter) or DeepSeek.
-
-

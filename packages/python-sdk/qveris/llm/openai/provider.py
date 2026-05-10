@@ -11,7 +11,7 @@ from ...config import AgentConfig
 class OpenAIProvider(LLMProvider):
     def __init__(self, config: Optional[OpenAIConfig] = None):
         self.config = config or OpenAIConfig()
-        
+
         # AsyncOpenAI automatically picks up HTTP_PROXY/HTTPS_PROXY from env
         self.client = AsyncOpenAI(
             api_key=self.config.api_key,
@@ -19,12 +19,12 @@ class OpenAIProvider(LLMProvider):
         )
 
     async def chat_stream(
-        self, 
-        messages: List[Message], 
+        self,
+        messages: List[Message],
         tools: List[ChatCompletionToolParam],
         config: AgentConfig
     ) -> AsyncGenerator[StreamEvent, None]:
-        
+
         # Convert Pydantic messages to OpenAI format
         openai_messages = []
         for msg in messages:
@@ -35,7 +35,7 @@ class OpenAIProvider(LLMProvider):
                 m["tool_call_id"] = msg.tool_call_id
             if msg.name:
                 m["name"] = msg.name
-            
+
             # Pass through provider-specific reasoning_details if present
             if msg.reasoning_details:
                 m["reasoning_details"] = msg.reasoning_details
@@ -59,7 +59,7 @@ class OpenAIProvider(LLMProvider):
 
         async for chunk in stream:
             delta = chunk.choices[0].delta if chunk.choices else None
-            
+
             # 1. Yield Content
             if delta and delta.content:
                 yield StreamEvent(type="content", content=delta.content)
@@ -74,7 +74,7 @@ class OpenAIProvider(LLMProvider):
                 details = delta.reasoning_details
                 if not isinstance(details, list):
                     details = [details]
-                
+
                 # Yield as a specialized event
                 yield StreamEvent(type="reasoning_details", details=details)
 
@@ -102,7 +102,7 @@ class OpenAIProvider(LLMProvider):
                     "output_tokens": chunk.usage.completion_tokens,
                     "total_tokens": chunk.usage.total_tokens
                 })
-        
+
         for tc in tool_calls_buffer:
             yield StreamEvent(type="tool_call", tool_call=tc)
 
@@ -113,7 +113,7 @@ class OpenAIProvider(LLMProvider):
         config: AgentConfig
     ) -> ChatResponse:
         """Non-streaming chat completion."""
-        
+
         # Convert Pydantic messages to OpenAI format
         openai_messages = []
         for msg in messages:

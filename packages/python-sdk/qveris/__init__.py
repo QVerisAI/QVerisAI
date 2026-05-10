@@ -6,7 +6,7 @@ from .types import Message, StreamEvent
 __all__ = [
     "Agent",
     "QverisClient",
-    "QverisConfig", 
+    "QverisConfig",
     "AgentConfig",
     "Message",
     "StreamEvent"

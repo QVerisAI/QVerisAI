@@ -28,4 +28,3 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["qveris"]
-

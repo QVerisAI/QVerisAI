@@ -39,7 +39,7 @@ class QverisConfig(BaseSettings):
     # Qveris Settings
     api_key: Optional[str] = Field(default=None, validation_alias='QVERIS_API_KEY')
     base_url: str = Field(default="https://api.qveris.com/v1", validation_alias='QVERIS_BASE_URL')
-    
+
     # Agent behavior settings
     enable_history_pruning: bool = Field(
         default=True,
@@ -49,7 +49,7 @@ class QverisConfig(BaseSettings):
         default=50,
         description="Maximum number of iterations for the agent tool loop",
     )
-    
+
     model_config = SettingsConfigDict(
         env_prefix="",  # We use specific aliases
         case_sensitive=False,
@@ -65,7 +65,7 @@ class AgentConfig(BaseSettings):
         - `additional_system_prompt` is appended to the default system prompt used for tool use.
         - `temperature` is forwarded to the provider (if supported).
     """
-    
+
     model: str = "gpt-5"
 
     additional_system_prompt: Optional[str] = None

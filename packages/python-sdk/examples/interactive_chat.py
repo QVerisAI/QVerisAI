@@ -68,10 +68,10 @@ class LiveLineManager:
 async def main():
     config = QverisConfig()
     openai_config = OpenAIConfig()
-    
+
     # Check for debug mode
     debug_mode = os.getenv("DEBUG", "").lower() in ("1", "true", "yes")
-    
+
     # Check keys
     if not config.api_key:
         console.print("[error]Please set QVERIS_API_KEY environment variable.[/error]")
@@ -93,7 +93,7 @@ async def main():
     title = "[bold cyan]Qveris Interactive Agent[/bold cyan]"
     if debug_mode:
         title += " [dim yellow][DEBUG MODE][/dim yellow]"
-    
+
     console.print(Panel.fit(
         f"{title}\n"
         f"Model: [bold white]{agent.agent_config.model}[/bold white]\n"
@@ -106,9 +106,9 @@ async def main():
             user_input = console.input("\n[user]You > [/user]")
             if user_input.lower() in ('exit', 'quit'):
                 break
-                
+
             messages.append(Message(role="user", content=user_input))
-            
+
             # State for live display
             # We use a Live display for the streaming content
             # Tool calls will be printed above/interleaved as they happen
@@ -116,27 +116,27 @@ async def main():
                 live_line = LiveLineManager(live)
 
                 async for event in agent.run(messages):
-                    
+
                     if event.type == "content":
                         live_line.append_content(event.content or "")
-                        
+
                     elif event.type == "reasoning":
-                        pass 
+                        pass
 
                     elif event.type == "reasoning_details":
                         pass
 
                     elif event.type == "tool_call":
                         live_line.stop()
-                        
+
                         tool_name = event.tool_call['function']['name']
                         tool_args = event.tool_call['function']['arguments']
-                        
+
                         # Shorten args for display
                         display_args = tool_args[:100] + "..." if len(tool_args) > 100 else tool_args
-                        
+
                         console.print(f"[tool]→ Calling {tool_name}[/tool] [dim]({display_args})[/dim]")
-                        
+
                         # In debug mode, show full arguments
                         if debug_mode:
                             try:
@@ -145,17 +145,17 @@ async def main():
                                 console.print(json.dumps(parsed_args, indent=2))
                             except:
                                 console.print(f"[dim yellow][DEBUG] Raw arguments: {tool_args}[/dim yellow]")
-                        
+
                         live_line.restart()
 
                     elif event.type == "tool_result":
                         live_line.stop()
-                        
+
                         tr = event.tool_result
                         tool_name = tr.get("name", "unknown")
                         result = tr.get("result", {})
                         is_error = tr.get("is_error", False)
-                        
+
                         if is_error:
                             console.print(f"[error]✗ {tool_name} failed:[/error] {result.get('error', 'Unknown error')}")
                         else:
@@ -173,7 +173,7 @@ async def main():
                                     console.print(f"[warning]⚠ Tool returned: {str(result)[:200]}[/warning]")
                             else:
                                 console.print(f"[info]✓ {tool_name} result:[/info] {str(result)[:200]}")
-                        
+
                         live_line.restart()
 
                     elif event.type == "error":
@@ -183,7 +183,7 @@ async def main():
 
             # End of turn
             messages.append(Message(role="assistant", content=live_line.current_content))
-            
+
         except (KeyboardInterrupt, EOFError, asyncio.CancelledError):
             console.print("\n[info]Goodbye![/info]")
             break
@@ -196,5 +196,5 @@ if __name__ == "__main__":
     except ImportError:
         print("Please install rich: pip install rich")
         sys.exit(1)
-        
+
     asyncio.run(main())

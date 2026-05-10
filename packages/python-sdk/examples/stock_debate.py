@@ -57,25 +57,25 @@ async def run_agent_turn(agent: Agent, messages: list[Message], agent_name: str,
     Returns final content. Tool calls are displayed as they occur.
     """
     final_content = ""
-    
+
     async for event in agent.run(messages, stream=False):
         if event.type == "content" and event.content:
             final_content = event.content  # Non-streaming: full content in one piece
-            
+
         elif event.type == "tool_call" and event.tool_call:
             tool_name = event.tool_call['function']['name']
             tool_args = event.tool_call['function']['arguments']
-            
+
             # Shorten args for display
             display_args = tool_args[:100] + "..." if len(tool_args) > 100 else tool_args
             console.print(f"[tool]→ {agent_name} calling {tool_name}[/tool] [dim]({display_args})[/dim]")
-            
+
         elif event.type == "tool_result" and event.tool_result:
             tr = event.tool_result
             tool_name = tr.get("name", "unknown")
             result = tr.get("result", {})
             is_error = tr.get("is_error", False)
-            
+
             if is_error:
                 console.print(f"[error]✗ {tool_name} failed:[/error] {result.get('error', 'Unknown error')}")
             else:
@@ -93,10 +93,10 @@ async def run_agent_turn(agent: Agent, messages: list[Message], agent_name: str,
                         console.print(f"[warning]⚠ Tool returned: {str(result)[:200]}[/warning]")
                 else:
                     console.print(f"[info]✓ {tool_name} result:[/info] {str(result)[:200]}")
-            
+
         elif event.type == "error" and event.error:
             console.print(f"[error]Error: {event.error}[/error]")
-    
+
     return final_content
 
 
@@ -174,7 +174,7 @@ async def main():
             other_name = "GPT-5.2"
 
         console.print(f"[dim]Running {agent_name}...[/dim]")
-        
+
         # Run the agent turn (non-streaming)
         response_content = await run_agent_turn(agent, conversation, agent_name, color)
 
