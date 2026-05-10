@@ -143,7 +143,7 @@ async def main():
                                 parsed_args = json.loads(tool_args)
                                 console.print(f"[dim yellow][DEBUG] Full {tool_name} arguments:[/dim yellow]")
                                 console.print(json.dumps(parsed_args, indent=2))
-                            except Exception:
+                            except json.JSONDecodeError:
                                 console.print(f"[dim yellow][DEBUG] Raw arguments: {tool_args}[/dim yellow]")
 
                         live_line.restart()
@@ -182,7 +182,7 @@ async def main():
                         live_line.restart()
 
             # End of turn
-            messages.append(Message(role="assistant", content=live_line.current_content))
+            messages = agent.get_last_messages()
 
         except (KeyboardInterrupt, EOFError, asyncio.CancelledError):
             console.print("\n[info]Goodbye![/info]")

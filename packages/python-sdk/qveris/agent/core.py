@@ -116,6 +116,8 @@ class Agent:
         # Setup new session
         self.new_session()
 
+        self.last_messages: List[Message] = []
+
     async def close(self) -> None:
         """
         Close network resources owned by the agent.
@@ -159,6 +161,20 @@ class Agent:
             return StreamEvent(type="error", error=f"LLM API error {error.status_code}: {error}")
         return StreamEvent(type="error", error=f"LLM error: {error}")
 
+    def _record_last_messages(self, current_messages: List[Message], inserted_system_prompt: bool) -> None:
+        messages_for_caller = current_messages[1:] if inserted_system_prompt else current_messages
+        self.last_messages = [message.model_copy(deep=True) for message in messages_for_caller]
+
+    def get_last_messages(self) -> List[Message]:
+        """
+        Return the latest conversation history produced by `run(...)`.
+
+        The returned history includes intermediate assistant tool calls and tool results, plus the
+        final assistant content when one was produced. If `run(...)` injected the default system
+        prompt, that internal system message is omitted so callers can reuse the list directly.
+        """
+        return [message.model_copy(deep=True) for message in self.last_messages]
+
     async def run(
         self,
         messages: List[Message],
@@ -190,8 +206,12 @@ class Agent:
         if self.agent_config.additional_system_prompt:
             system_prompt += '\n' + self.agent_config.additional_system_prompt
 
+        inserted_system_prompt = False
         if not current_messages or current_messages[0].role != "system":
             current_messages.insert(0, Message(role="system", content=system_prompt))
+            inserted_system_prompt = True
+
+        self._record_last_messages(current_messages, inserted_system_prompt)
 
         iteration = 0
         should_continue = True
@@ -263,6 +283,7 @@ class Agent:
                         yield StreamEvent(type="metrics", metrics=response.metrics)
 
             except Exception as e:
+                self._record_last_messages(current_messages, inserted_system_prompt)
                 yield self._llm_error_event(e)
                 return
 
@@ -340,12 +361,23 @@ class Agent:
                         content=json.dumps(result, default=str)
                     ))
 
+                self._record_last_messages(current_messages, inserted_system_prompt)
                 continue
 
             else:
+                if content_accumulated or reasoning_details_accumulated:
+                    current_messages.append(Message(
+                        role="assistant",
+                        content=content_accumulated if content_accumulated else None,
+                        reasoning_details=(
+                            reasoning_details_accumulated if reasoning_details_accumulated else None
+                        )
+                    ))
+                self._record_last_messages(current_messages, inserted_system_prompt)
                 should_continue = False
 
         if should_continue:
+            self._record_last_messages(current_messages, inserted_system_prompt)
             yield StreamEvent(
                 type="error",
                 error=f"Agent stopped after reaching max_iterations={self.config.max_iterations}"

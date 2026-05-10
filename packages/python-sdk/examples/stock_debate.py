@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import json
 import os
@@ -51,10 +53,18 @@ def print_agent_response(agent_name: str, model: str, content: str, color: str, 
     console.print()
 
 
-async def run_agent_turn(agent: Agent, messages: list[Message], agent_name: str, color: str) -> str:
+def label_latest_assistant_message(messages: list[Message], agent_name: str) -> None:
+    """Tag the final assistant answer with the speaker name for the shared debate transcript."""
+    for message in reversed(messages):
+        if message.role == "assistant" and message.content and not message.tool_calls:
+            message.content = f"[{agent_name}]: {message.content}"
+            return
+
+
+async def run_agent_turn(agent: Agent, messages: list[Message], agent_name: str, color: str) -> tuple[str, list[Message]]:
     """
     Run a single agent turn using NON-STREAMING via unified run() API.
-    Returns final content. Tool calls are displayed as they occur.
+    Returns final content and updated conversation history. Tool calls are displayed as they occur.
     """
     final_content = ""
 
@@ -97,7 +107,7 @@ async def run_agent_turn(agent: Agent, messages: list[Message], agent_name: str,
         elif event.type == "error" and event.error:
             console.print(f"[error]Error: {event.error}[/error]")
 
-    return final_content
+    return final_content, agent.get_last_messages()
 
 
 async def main():
@@ -176,15 +186,14 @@ async def main():
         console.print(f"[dim]Running {agent_name}...[/dim]")
 
         # Run the agent turn (non-streaming)
-        response_content = await run_agent_turn(agent, conversation, agent_name, color)
+        response_content, updated_conversation = await run_agent_turn(agent, conversation, agent_name, color)
+        conversation = updated_conversation
 
         # Only count as a round if there's actual content
         if response_content and response_content.strip():
             round_num += 1
+            label_latest_assistant_message(conversation, agent_name)
             print_agent_response(agent_name, model, response_content, color, round_num)
-
-            # Add response to conversation
-            conversation.append(Message(role="assistant", content=f"[{agent_name}]: {response_content}"))
 
             # Prepare prompt for next agent
             if round_num < MAX_ROUNDS:
