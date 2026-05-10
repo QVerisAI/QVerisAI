@@ -46,18 +46,18 @@
 
 从 GitHub 仓库下载 QVeris MCP/客户端技能：
 
-**仓库地址：** https://github.com/QVerisAI/QVerisAI/tree/main/skills/qveris
+**仓库地址：** https://github.com/QVerisAI/qveris-agent-toolkit/tree/main/skills/qveris
 
 **Mac/Linux：**
 ```bash
 mkdir -p ~/.config/opencode/skill/qveris
-curl -sL https://raw.githubusercontent.com/QVerisAI/QVerisAI/main/skills/qveris/SKILL.md -o ~/.config/opencode/skill/qveris/SKILL.md
+curl -sL https://raw.githubusercontent.com/QVerisAI/qveris-agent-toolkit/main/skills/qveris/SKILL.md -o ~/.config/opencode/skill/qveris/SKILL.md
 ```
 
 **Windows（PowerShell）：**
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.config\opencode\skill\qveris"
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/QVerisAI/QVerisAI/main/skills/qveris/SKILL.md" -OutFile "$env:USERPROFILE\.config\opencode\skill\qveris\SKILL.md"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/QVerisAI/qveris-agent-toolkit/main/skills/qveris/SKILL.md" -OutFile "$env:USERPROFILE\.config\opencode\skill\qveris\SKILL.md"
 ```
 
 技能目录结构应如下所示：
