@@ -210,6 +210,11 @@ class Agent:
         if not current_messages or current_messages[0].role != "system":
             current_messages.insert(0, Message(role="system", content=system_prompt))
             inserted_system_prompt = True
+        else:
+            existing_system_prompt = current_messages[0].content or ""
+            if not existing_system_prompt.startswith(system_prompt):
+                separator = "\n\n" if existing_system_prompt else ""
+                current_messages[0].content = system_prompt + separator + existing_system_prompt
 
         self._record_last_messages(current_messages, inserted_system_prompt)
 
@@ -394,6 +399,8 @@ class Agent:
         async for event in self.run(messages, stream=False):
             if event.type == "content":
                 content += event.content or ""
+            elif event.type == "error":
+                raise RuntimeError(f"Agent execution failed: {event.error}")
         return content
 
     def new_session(self) -> str:

@@ -66,7 +66,7 @@ class AgentConfig(BaseSettings):
         - `temperature` is forwarded to the provider (if supported).
     """
 
-    model: str = "gpt-5"
+    model: str = "gpt-4o"
 
     additional_system_prompt: Optional[str] = None
 
