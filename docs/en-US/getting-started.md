@@ -83,7 +83,7 @@ The assistant will:
 
 ### Use the QVeris Python SDK
 
-Get it from [github](https://github.com/QVerisAI/sdk-python) and install:
+The Python SDK now lives in this monorepo at [`packages/python-sdk`](../../packages/python-sdk). Install the published package with:
 
 ```bash
 pip install qveris
