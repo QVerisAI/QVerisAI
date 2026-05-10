@@ -9,8 +9,8 @@ into your own agent framework.
 
 ## Endpoints
 
-- `POST /search` → `search_tools(...)`
-- `POST /tools/execute?tool_id=...` → `execute_tool(...)`
+- `POST /search` → `discover(...)`
+- `POST /tools/execute?tool_id=...` → `call(...)`
 
 ## Authentication
 
@@ -78,9 +78,9 @@ class QverisClient:
         """
         await self.client.aclose()
 
-    async def search_tools(self, query: str, limit: int = 100, session_id: Optional[str] = None) -> SearchResponse:
+    async def discover(self, query: str, limit: int = 100, session_id: Optional[str] = None) -> SearchResponse:
         """
-        Search the Qveris tool index.
+        Discover capabilities from the Qveris index.
 
         Args:
             query: Natural-language description of the capability you want (not parameters).
@@ -111,7 +111,13 @@ class QverisClient:
         response.raise_for_status()
         return SearchResponse(**data)
 
-    async def execute_tool(
+    async def search_tools(self, query: str, limit: int = 100, session_id: Optional[str] = None) -> SearchResponse:
+        """
+        Deprecated alias for `discover(...)`.
+        """
+        return await self.discover(query=query, limit=limit, session_id=session_id)
+
+    async def call(
         self,
         tool_id: str,
         parameters: Dict[str, Any],
@@ -120,12 +126,12 @@ class QverisClient:
         max_response_size: Optional[int] = None
     ) -> ToolExecutionResponse:
         """
-        Execute a specific tool.
+        Call a specific capability.
 
         Args:
-            tool_id: Tool identifier returned by `search_tools(...)`.
+            tool_id: Tool identifier returned by `discover(...)`.
             parameters: JSON-serializable parameters for the tool.
-            search_id: Search id returned by `search_tools(...)` (recommended for traceability).
+            search_id: Search id returned by `discover(...)` (recommended for traceability).
             session_id: Optional correlation id.
             max_response_size: Optional max response size in bytes. Large responses may be truncated.
 
@@ -161,6 +167,25 @@ class QverisClient:
         response.raise_for_status()
         return ToolExecutionResponse(**data)
 
+    async def execute_tool(
+        self,
+        tool_id: str,
+        parameters: Dict[str, Any],
+        search_id: Optional[str] = None,
+        session_id: Optional[str] = None,
+        max_response_size: Optional[int] = None
+    ) -> ToolExecutionResponse:
+        """
+        Deprecated alias for `call(...)`.
+        """
+        return await self.call(
+            tool_id=tool_id,
+            parameters=parameters,
+            search_id=search_id,
+            session_id=session_id,
+            max_response_size=max_response_size,
+        )
+
     async def handle_tool_call(
         self,
         func_name: str,
@@ -168,7 +193,9 @@ class QverisClient:
         session_id: Optional[str] = None
     ) -> Tuple[Any, bool, bool]:
         """
-        Handle a built-in Qveris tool (search_tools, execute_tool) call from an LLM response.
+        Handle a built-in Qveris tool (`discover`, `call`) from an LLM response.
+
+        Deprecated names (`search_tools`, `execute_tool`) are accepted as aliases.
 
         Args:
             func_name: The name of the function/tool to call
@@ -182,28 +209,28 @@ class QverisClient:
             - handled: True if this was a Qveris tool and was processed
 
         Notes:
-            - For `execute_tool`, the OpenAI tool schema uses a JSON-string argument field
+            - For `call`, the tool schema uses a JSON-string argument field
               (`params_to_tool`) which this method parses into a dict.
             - If `func_name` is not a Qveris built-in, `(None, False, False)` is returned so that
               callers can route to their own tool handlers.
         """
         try:
-            if func_name == "search_tools":
-                result = await self.search_tools(
+            if func_name in {"discover", "search_tools"}:
+                result = await self.discover(
                     query=func_args.get("query"),
                     limit=func_args.get("limit", 10),
                     session_id=session_id
                 )
                 return result.model_dump(), False, True
 
-            elif func_name == "execute_tool":
+            elif func_name in {"call", "execute_tool"}:
                 params_str = func_args.get("params_to_tool")
                 try:
                     params = json.loads(params_str) if params_str else {}
                 except (json.JSONDecodeError, TypeError):
                     params = {}
 
-                result = await self.execute_tool(
+                result = await self.call(
                     tool_id=func_args.get("tool_id"),
                     parameters=params,
                     search_id=func_args.get("search_id"),

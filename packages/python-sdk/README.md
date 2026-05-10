@@ -6,13 +6,14 @@ Empower LLM agents with [**QVeris**](https://qveris.ai): dynamically discover, i
 
 QVeris provides a **capability routing** layer for agents:
 
-- **discover**: the agent can call `search_tools` with a natural-language capability query (e.g. “stock price”, “web search”, “send email”).
-- **call**: after selecting a capability from search results, the agent calls `execute_tool` with the tool id + parameters.
+- **discover**: find matching capabilities with a natural-language query (e.g. "stock price", "web search", "send email").
+- **inspect**: review parameters, examples, quality signals, and billing metadata before calling.
+- **call**: invoke the selected capability with the tool id, search id, and structured parameters.
 
 The `qveris.Agent` wraps this into a loop that:
 
-- searches for suitable tools to complete the task,
-- executes proper tools (and your extra tools, if provided),
+- discovers suitable capabilities to complete the task,
+- calls proper capabilities (and your extra tools, if provided),
 - feeds tool outputs back into the LLM until it reaches a final answer.
 
 ## Configuration
