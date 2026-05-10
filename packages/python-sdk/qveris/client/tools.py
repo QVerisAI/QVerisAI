@@ -1,95 +1,115 @@
 """
 Qveris tool definitions and default system prompt.
 
-This module provides the standard tool definitions for the Qveris agent,
-using OpenAI's standard ChatCompletionToolParam type.
+These definitions are designed for OpenAI-compatible chat APIs. The canonical
+QVeris Agent External Data & Tool Harness workflow is:
 
-These definitions are designed to be passed directly to OpenAI-compatible chat
-APIs (including many third-party providers that follow the OpenAI tool-calling
-schema).
-
-## Tool calling contract
-
-The LLM is expected to:
-
-1. call `search_tools` with a capability query (e.g. "weather forecast", "stock price"),
-2. choose a tool from the search results,
-3. call `execute_tool` using:
-   - `tool_id` from the selected tool
-   - `search_id` from the `search_tools` response
-   - `params_to_tool` as a **JSON-stringified** object of parameters for that tool.
-
-`qveris.Agent` handles this automatically. If you build your own agent loop,
-pair these tool schemas with `qveris.client.api.QverisClient.handle_tool_call(...)`.
+1. `discover` capabilities with a natural-language query.
+2. `inspect` one or more candidate `tool_id`s when more detail is needed.
+3. `call` the selected capability with parameters.
+4. Use `usage_history` or `credits_ledger` when final charge status matters.
 """
 
 from openai.types.chat import ChatCompletionToolParam
 
-# Default system prompt for Qveris agents.
-# Kept as a single string so callers can prepend/append to their own prompts.
 DEFAULT_SYSTEM_PROMPT = (
-    'You are a helpful assistant that can dynamically search and execute tools to help the user. '
-    'First think about what kind of tools might be useful to accomplish the user\'s task. '
-    'Then use the search_tools tool with query describing the capability of the tool, not what params you want to pass to the tool later. '
-    'Then call suitable searched tool(s) using the execute_tool tool, passing parameters to the searched tool through params_to_tool. '
-    'If tool has weighted_success_rate and avg_execution_time (in seconds), consider them when selecting which tool to call. '
-    'You could reference the examples given if any for each tool. '
-    'If this round is search_tools results, be sure to call the tools you think are suitable first. '
-    'You could call make multiple tool calls in a single response. '
+    "You are a helpful assistant that can dynamically discover, inspect, and call "
+    "QVeris capabilities to help the user. First think about what kind of capability "
+    "is useful for the user's task. Use discover with a query describing the capability, "
+    "not the parameters you intend to pass later. If multiple results look relevant, "
+    "use inspect to compare parameters, examples, latency, success rate, and billing rules. "
+    "Then call a suitable capability using tool_id, search_id, and params_to_tool. "
+    "Use usage_history or credits_ledger only when the user asks about charge status, "
+    "usage audit, or credit balance movements."
 )
 
-# Search tools definition
-SEARCH_TOOL_DEF: ChatCompletionToolParam = {
+DISCOVER_TOOL_DEF: ChatCompletionToolParam = {
     "type": "function",
     "function": {
-        "name": "search_tools",
-        "description": "Search for available tools based on a query. Returns relevant tools that can help accomplish tasks.",
+        "name": "discover",
+        "description": "Discover available QVeris capabilities based on a natural-language query.",
         "parameters": {
             "type": "object",
             "properties": {
                 "query": {
                     "type": "string",
-                    "description": "The search query to find relevant tools"
+                    "description": "The capability query, for example weather forecast API or stock price data",
                 },
                 "limit": {
                     "type": "integer",
-                    "description": "The number of tools to return (default 10)"
-                }
+                    "description": "The number of results to return, from 1 to 100",
+                    "default": 20,
+                },
             },
-            "required": ["query"]
-        }
-    }
+            "required": ["query"],
+        },
+    },
 }
 
-# Execute tool definition
-EXECUTE_TOOL_DEF: ChatCompletionToolParam = {
+INSPECT_TOOL_DEF: ChatCompletionToolParam = {
     "type": "function",
     "function": {
-        "name": "execute_tool",
-        "description": "Execute a specific tool with provided parameters. The tool_id must come from a previous search_tools call.",
+        "name": "inspect",
+        "description": "Inspect one or more QVeris capabilities by tool_id before calling them.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tool_ids": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Tool IDs returned by discover",
+                },
+                "search_id": {
+                    "type": "string",
+                    "description": "The search_id from the discover response, if available",
+                },
+            },
+            "required": ["tool_ids"],
+        },
+    },
+}
+
+CALL_TOOL_DEF: ChatCompletionToolParam = {
+    "type": "function",
+    "function": {
+        "name": "call",
+        "description": "Call a selected QVeris capability with JSON parameters.",
         "parameters": {
             "type": "object",
             "properties": {
                 "tool_id": {
                     "type": "string",
-                    "description": "The ID of the tool to execute (from search results)"
+                    "description": "The ID of the capability to call, from discover or inspect",
                 },
                 "search_id": {
                     "type": "string",
-                    "description": "The search_id in the response of the search_tools call"
+                    "description": "The search_id from the discover response",
                 },
                 "params_to_tool": {
-                    "type": "string",
-                    "description": "A JSON stringified dictionary of parameters to pass to the tool."
+                    "type": "object",
+                    "description": "Parameters to pass to the capability",
                 },
                 "max_response_size": {
                     "type": "integer",
-                    "description": "Max data size in bytes (default 20480)"
-                }
+                    "description": "Max response size in bytes; -1 means unlimited",
+                },
             },
-            "required": ["tool_id", "search_id", "params_to_tool"]
-        }
-    }
+            "required": ["tool_id", "search_id", "params_to_tool"],
+        },
+    },
 }
 
-__all__ = ["DEFAULT_SYSTEM_PROMPT", "SEARCH_TOOL_DEF", "EXECUTE_TOOL_DEF"]
+# Backward-compatible aliases for older agent loops.
+SEARCH_TOOL_DEF = DISCOVER_TOOL_DEF
+GET_TOOLS_BY_IDS_TOOL_DEF = INSPECT_TOOL_DEF
+EXECUTE_TOOL_DEF = CALL_TOOL_DEF
+
+__all__ = [
+    "DEFAULT_SYSTEM_PROMPT",
+    "DISCOVER_TOOL_DEF",
+    "INSPECT_TOOL_DEF",
+    "CALL_TOOL_DEF",
+    "SEARCH_TOOL_DEF",
+    "GET_TOOLS_BY_IDS_TOOL_DEF",
+    "EXECUTE_TOOL_DEF",
+]

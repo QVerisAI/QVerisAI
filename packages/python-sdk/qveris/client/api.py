@@ -9,8 +9,11 @@ into your own agent framework.
 
 ## Endpoints
 
-- `POST /search` → `search_tools(...)`
-- `POST /tools/execute?tool_id=...` → `execute_tool(...)`
+- `POST /search` -> `discover(...)`
+- `POST /tools/by-ids` -> `inspect(...)`
+- `POST /tools/execute?tool_id=...` -> `call(...)`
+- `GET /auth/usage/history/v2` -> `usage(...)`
+- `GET /auth/credits/ledger` -> `ledger(...)`
 
 ## Authentication
 
@@ -22,12 +25,12 @@ Debug logs redact the token value.
 """
 
 import json
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, Optional, Tuple
 
 import httpx
 
 from ..config import QverisConfig
-from ..types import SearchResponse, ToolExecutionResponse
+from ..types import CreditsLedgerResponse, SearchResponse, ToolExecutionResponse, UsageHistoryResponse
 
 class QverisClient:
     """
@@ -70,6 +73,18 @@ class QverisClient:
         """Build the effective request URL using the same httpx client settings."""
         return str(self.client.build_request("POST", path, params=params).url)
 
+    def _query_params(self, **kwargs: Any) -> Dict[str, Any]:
+        """Drop None-valued query params while preserving falsey filters like 0 and False."""
+        return {key: value for key, value in kwargs.items() if value is not None}
+
+    def _unwrap_envelope(self, data: Any) -> Any:
+        """Accept both raw payloads and standard {status, data} API envelopes."""
+        if isinstance(data, dict) and "data" in data and (
+            "status" in data or "status_code" in data or "message" in data
+        ):
+            return data["data"]
+        return data
+
     async def close(self):
         """
         Close the underlying HTTP client.
@@ -78,9 +93,9 @@ class QverisClient:
         """
         await self.client.aclose()
 
-    async def search_tools(self, query: str, limit: int = 100, session_id: Optional[str] = None) -> SearchResponse:
+    async def discover(self, query: str, limit: int = 20, session_id: Optional[str] = None) -> SearchResponse:
         """
-        Search the Qveris tool index.
+        Discover capabilities using natural language.
 
         Args:
             query: Natural-language description of the capability you want (not parameters).
@@ -111,6 +126,55 @@ class QverisClient:
         response.raise_for_status()
         return SearchResponse(**data)
 
+    async def search_tools(self, query: str, limit: int = 100, session_id: Optional[str] = None) -> SearchResponse:
+        """Deprecated alias for `discover(...)`."""
+        return await self.discover(query=query, limit=limit, session_id=session_id)
+
+    async def inspect(
+        self,
+        tool_ids: Iterable[str],
+        search_id: Optional[str] = None,
+        session_id: Optional[str] = None
+    ) -> SearchResponse:
+        """
+        Inspect one or more capabilities by tool ID.
+
+        Args:
+            tool_ids: Tool IDs returned by `discover(...)`.
+            search_id: Optional search ID that produced the tools.
+            session_id: Optional correlation ID.
+
+        Returns:
+            `SearchResponse` with full tool details for the requested IDs.
+        """
+        ids = list(tool_ids)
+        url = self._url_for("tools/by-ids")
+        payload: Dict[str, Any] = {"tool_ids": ids}
+        if search_id:
+            payload["search_id"] = search_id
+        if session_id:
+            payload["session_id"] = session_id
+
+        self._debug(f"[Qveris API] POST {url}")
+        self._debug(f"[Qveris API] Request body: {json.dumps(payload, indent=2)}")
+        self._debug(f"[Qveris API] Headers: {json.dumps({k: v if k != 'Authorization' else 'Bearer ***' for k, v in self.headers.items()}, indent=2)}")
+
+        response = await self.client.post("tools/by-ids", json=payload)
+
+        self._debug(f"[Qveris API] Response status: {response.status_code}")
+        data = self._parse_response_json(response)
+        response.raise_for_status()
+        return SearchResponse(**data)
+
+    async def get_tools_by_ids(
+        self,
+        tool_ids: Iterable[str],
+        search_id: Optional[str] = None,
+        session_id: Optional[str] = None
+    ) -> SearchResponse:
+        """Deprecated alias for `inspect(...)`."""
+        return await self.inspect(tool_ids=tool_ids, search_id=search_id, session_id=session_id)
+
     async def execute_tool(
         self,
         tool_id: str,
@@ -119,13 +183,30 @@ class QverisClient:
         session_id: Optional[str] = None,
         max_response_size: Optional[int] = None
     ) -> ToolExecutionResponse:
+        """Deprecated alias for `call(...)`."""
+        return await self.call(
+            tool_id=tool_id,
+            parameters=parameters,
+            search_id=search_id,
+            session_id=session_id,
+            max_response_size=max_response_size,
+        )
+
+    async def call(
+        self,
+        tool_id: str,
+        parameters: Dict[str, Any],
+        search_id: Optional[str] = None,
+        session_id: Optional[str] = None,
+        max_response_size: Optional[int] = None
+    ) -> ToolExecutionResponse:
         """
-        Execute a specific tool.
+        Call a specific capability.
 
         Args:
-            tool_id: Tool identifier returned by `search_tools(...)`.
+            tool_id: Tool identifier returned by `discover(...)`.
             parameters: JSON-serializable parameters for the tool.
-            search_id: Search id returned by `search_tools(...)` (recommended for traceability).
+            search_id: Search ID returned by `discover(...)` (recommended for traceability).
             session_id: Optional correlation id.
             max_response_size: Optional max response size in bytes. Large responses may be truncated.
 
@@ -161,6 +242,98 @@ class QverisClient:
         response.raise_for_status()
         return ToolExecutionResponse(**data)
 
+    async def usage(
+        self,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        summary: Optional[bool] = True,
+        bucket: Optional[str] = None,
+        event_type: Optional[str] = None,
+        kind: Optional[str] = None,
+        success: Optional[bool] = None,
+        charge_outcome: Optional[str] = None,
+        search_id: Optional[str] = None,
+        execution_id: Optional[str] = None,
+        min_credits: Optional[float] = None,
+        max_credits: Optional[float] = None,
+        limit: Optional[int] = None,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None,
+    ) -> UsageHistoryResponse:
+        """
+        Query request-level usage audit history.
+
+        Use this to verify success, failure, charge outcome, and final settlement
+        context for discover/inspect/call activity.
+        """
+        params = self._query_params(
+            start_date=start_date,
+            end_date=end_date,
+            summary=summary,
+            bucket=bucket,
+            event_type=event_type,
+            kind=kind,
+            success=success,
+            charge_outcome=charge_outcome,
+            search_id=search_id,
+            execution_id=execution_id,
+            min_credits=min_credits,
+            max_credits=max_credits,
+            limit=limit,
+            page=page,
+            page_size=page_size,
+        )
+
+        self._debug(f"[Qveris API] GET {self.client.build_request('GET', 'auth/usage/history/v2', params=params).url}")
+        response = await self.client.get("auth/usage/history/v2", params=params)
+        self._debug(f"[Qveris API] Response status: {response.status_code}")
+        data = self._unwrap_envelope(self._parse_response_json(response))
+        response.raise_for_status()
+        return UsageHistoryResponse(**data)
+
+    async def ledger(
+        self,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        summary: Optional[bool] = True,
+        bucket: Optional[str] = None,
+        entry_type: Optional[str] = None,
+        direction: Optional[str] = None,
+        min_credits: Optional[float] = None,
+        max_credits: Optional[float] = None,
+        limit: Optional[int] = None,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None,
+    ) -> CreditsLedgerResponse:
+        """
+        Query final credits ledger entries.
+
+        Use this when you need authoritative credit balance movements rather than
+        pre-settlement billing hints returned by `call(...)`.
+        """
+        params = self._query_params(
+            start_date=start_date,
+            end_date=end_date,
+            summary=summary,
+            bucket=bucket,
+            entry_type=entry_type,
+            direction=direction,
+            min_credits=min_credits,
+            max_credits=max_credits,
+            limit=limit,
+            page=page,
+            page_size=page_size,
+        )
+
+        self._debug(f"[Qveris API] GET {self.client.build_request('GET', 'auth/credits/ledger', params=params).url}")
+        response = await self.client.get("auth/credits/ledger", params=params)
+        self._debug(f"[Qveris API] Response status: {response.status_code}")
+        data = self._unwrap_envelope(self._parse_response_json(response))
+        response.raise_for_status()
+        return CreditsLedgerResponse(**data)
+
     async def handle_tool_call(
         self,
         func_name: str,
@@ -168,7 +341,7 @@ class QverisClient:
         session_id: Optional[str] = None
     ) -> Tuple[Any, bool, bool]:
         """
-        Handle a built-in Qveris tool (search_tools, execute_tool) call from an LLM response.
+        Handle a built-in Qveris tool call from an LLM response.
 
         Args:
             func_name: The name of the function/tool to call
@@ -182,28 +355,35 @@ class QverisClient:
             - handled: True if this was a Qveris tool and was processed
 
         Notes:
-            - For `execute_tool`, the OpenAI tool schema uses a JSON-string argument field
-              (`params_to_tool`) which this method parses into a dict.
+            - `params_to_tool` may be either a dict (canonical) or a JSON string (legacy).
             - If `func_name` is not a Qveris built-in, `(None, False, False)` is returned so that
               callers can route to their own tool handlers.
         """
         try:
-            if func_name == "search_tools":
-                result = await self.search_tools(
+            if func_name in ("discover", "search_tools"):
+                result = await self.discover(
                     query=func_args.get("query"),
                     limit=func_args.get("limit", 10),
                     session_id=session_id
                 )
                 return result.model_dump(), False, True
 
-            elif func_name == "execute_tool":
+            elif func_name in ("inspect", "get_tools_by_ids"):
+                result = await self.inspect(
+                    tool_ids=func_args.get("tool_ids") or [],
+                    search_id=func_args.get("search_id"),
+                    session_id=session_id
+                )
+                return result.model_dump(), False, True
+
+            elif func_name in ("call", "execute_tool"):
                 params_str = func_args.get("params_to_tool")
                 try:
-                    params = json.loads(params_str) if params_str else {}
+                    params = json.loads(params_str) if isinstance(params_str, str) else params_str or {}
                 except (json.JSONDecodeError, TypeError):
                     params = {}
 
-                result = await self.execute_tool(
+                result = await self.call(
                     tool_id=func_args.get("tool_id"),
                     parameters=params,
                     search_id=func_args.get("search_id"),
