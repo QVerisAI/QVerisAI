@@ -61,7 +61,7 @@ class QverisClient:
             data = response.json()
             self._debug(f"[Qveris API] Response body: {json.dumps(data, indent=2)}")
             return data
-        except Exception:
+        except json.JSONDecodeError:
             self._debug(f"[Qveris API] Response body (raw): {response.text[:500]}")
             response.raise_for_status()
             raise
