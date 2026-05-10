@@ -24,7 +24,7 @@ Most capable coding agents can finish the setup and resolve issues automatically
 
 For Claude Code:
 ```
-Configure this for me https://github.com/QVerisAI/qveris-agent-toolkit/blob/main/docs/claude-code-setup.md. The API key is sk-xxxxxxxxxxxxx
+Configure this for me https://github.com/QVerisAI/qveris-agent-toolkit/blob/main/docs/en-US/claude-code-setup.md. The API key is sk-xxxxxxxxxxxxx
 ```
 
 For OpenCode:
