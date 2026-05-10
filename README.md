@@ -56,7 +56,7 @@
 > → **[QVeris CLI](packages/cli)** — `npm install -g @qverisai/cli` or `curl -fsSL https://qveris.ai/cli/install | bash`
 > → [MCP Server Doc](docs/mcp-server.md)
 > → [REST API Doc](docs/rest-api.md)
-> → [Python SDK](https://github.com/QVerisAI/sdk-python)
+> → [Python SDK](packages/python-sdk)
 
 ---
 
@@ -187,7 +187,7 @@ Full CLI documentation: [packages/cli/README.md](packages/cli/README.md)
 |--------|----------|------|
 | **CLI** (recommended) | Claude Code / OpenClaw / any agent with exec | [CLI docs](packages/cli/README.md) |
 | MCP Server | Cursor / Claude Desktop / MCP-only clients | [MCP docs](docs/mcp-server.md) |
-| Python SDK | Python projects, agent frameworks | [sdk-python](https://github.com/QVerisAI/sdk-python) |
+| Python SDK | Python projects, agent frameworks | [Python SDK docs](packages/python-sdk/README.md) |
 | REST API | Any language, custom integrations | [REST API docs](docs/rest-api.md) |
 
 ### Core protocol
@@ -253,10 +253,11 @@ QVeris's core routing engine runs as a managed service. We actively support the 
 
 This repository (`QVerisAI/QVerisAI`) is the primary monorepo for QVeris client-side tooling:
 
-| Package | Path | npm |
-|---------|------|-----|
+| Package | Path | Distribution |
+|---------|------|--------------|
 | MCP Server | [`packages/mcp`](packages/mcp) | [@qverisai/mcp](https://www.npmjs.com/package/@qverisai/mcp) |
 | CLI | [`packages/cli`](packages/cli) | [@qverisai/cli](https://www.npmjs.com/package/@qverisai/cli) |
+| Python SDK | [`packages/python-sdk`](packages/python-sdk) | [qveris](https://pypi.org/project/qveris/) |
 | Agent docs | [`agent/`](agent) | — |
 | Skills | [`skills/`](skills) | — |
 
@@ -264,7 +265,6 @@ This repository (`QVerisAI/QVerisAI`) is the primary monorepo for QVeris client-
 
 | Repository | Description |
 |------------|-------------|
-| [QVerisAI/sdk-python](https://github.com/QVerisAI/sdk-python) | Python SDK |
 | [QVerisAI/open-qveris-skills](https://github.com/QVerisAI/open-qveris-skills) | Community skills (stock copilot, market reports, etc.) |
 | [QVerisAI/openclaw-qveris-plugin](https://github.com/QVerisAI/openclaw-qveris-plugin) | OpenClaw plugin |
 | [QVerisAI/vscode-qveris-ai](https://github.com/QVerisAI/vscode-qveris-ai) | VS Code extension |
@@ -274,7 +274,7 @@ Full list: [github.com/orgs/QVerisAI/repositories](https://github.com/orgs/QVeri
 ### Distribution channels
 
 - **npm**: [@qverisai](https://www.npmjs.com/org/qverisai) — MCP server, CLI
-- **PyPI**: [QVerisAI/sdk-python](https://github.com/QVerisAI/sdk-python) — Python SDK
+- **PyPI**: [qveris](https://pypi.org/project/qveris/) — Python SDK
 - **ClawHub**: [clawhub.ai/skills?q=qveris](https://clawhub.ai/skills?sort=downloads&q=qveris) — OpenClaw skills
 - **One-liner install**: `curl -fsSL https://qveris.ai/cli/install | bash`
 

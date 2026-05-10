@@ -83,7 +83,7 @@ CLI 还支持交互模式（`qveris interactive`）、代码生成（`--codegen 
 
 ### 使用 QVeris Python SDK
 
-从 [GitHub](https://github.com/QVerisAI/sdk-python) 获取并安装：
+Python SDK 现在位于本 monorepo 的 [`packages/python-sdk`](../../../packages/python-sdk)。安装已发布的包：
 
 ```bash
 pip install qveris

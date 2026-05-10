@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
 ## Examples
 
-This repo includes two example scripts that show different integration styles:
+This package includes two example scripts that show different integration styles:
 
 - **Interactive streaming chat** (`examples/interactive_chat.py`): a terminal chat UI that streams tokens and prints tool calls/results as they happen (great for debugging and demos).
 - **Stock debate** (`examples/stock_debate.py`): two agents debate NVIDIA using non-streaming turns while still surfacing tool calls/results (demonstrates multi-agent orchestration and different models).
