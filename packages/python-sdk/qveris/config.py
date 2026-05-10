@@ -38,7 +38,7 @@ class QverisConfig(BaseSettings):
     """
     # Qveris Settings
     api_key: Optional[str] = Field(default=None, validation_alias='QVERIS_API_KEY')
-    base_url: str = Field(default="https://api.qveris.com/v1", validation_alias='QVERIS_BASE_URL')
+    base_url: str = Field(default="https://qveris.ai/api/v1", validation_alias='QVERIS_BASE_URL')
 
     # Agent behavior settings
     enable_history_pruning: bool = Field(
