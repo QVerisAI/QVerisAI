@@ -54,6 +54,17 @@ class QverisClient:
         if self.debug_callback:
             self.debug_callback(message)
 
+    def _parse_response_json(self, response: httpx.Response) -> Any:
+        """Parse response JSON once while still logging non-JSON bodies for debugging."""
+        try:
+            data = response.json()
+            self._debug(f"[Qveris API] Response body: {json.dumps(data, indent=2)}")
+            return data
+        except Exception:
+            self._debug(f"[Qveris API] Response body (raw): {response.text[:500]}")
+            response.raise_for_status()
+            raise
+
     async def close(self):
         """
         Close the underlying HTTP client.
@@ -91,15 +102,9 @@ class QverisClient:
         response = await self.client.post("/search", json=payload)
 
         self._debug(f"[Qveris API] Response status: {response.status_code}")
-        try:
-            data = response.json()
-            self._debug(f"[Qveris API] Response body: {json.dumps(data, indent=2)}")
-        except Exception:
-            data = None
-            self._debug(f"[Qveris API] Response body (raw): {response.text[:500]}")
-
+        data = self._parse_response_json(response)
         response.raise_for_status()
-        return SearchResponse(**(data if data is not None else response.json()))
+        return SearchResponse(**data)
 
     async def execute_tool(
         self,
@@ -147,14 +152,9 @@ class QverisClient:
         )
 
         self._debug(f"[Qveris API] Response status: {response.status_code}")
-        try:
-            response_json = response.json()
-            self._debug(f"[Qveris API] Response body: {json.dumps(response_json, indent=2)}")
-        except Exception:
-            self._debug(f"[Qveris API] Response body (raw): {response.text[:500]}")
-
+        data = self._parse_response_json(response)
         response.raise_for_status()
-        return ToolExecutionResponse(**response.json())
+        return ToolExecutionResponse(**data)
 
     async def handle_tool_call(
         self,
