@@ -511,7 +511,7 @@ qveris call "$TOOL" --discovery-id "$SEARCH_ID" --params '{"city":"London"}' --j
 ## 链接
 
 - 官网：[qveris.ai](https://qveris.ai)（全球）/ [qveris.cn](https://qveris.cn)（中国）
-- GitHub：[QVerisAI/QVerisAI](https://github.com/QVerisAI/QVerisAI)
+- GitHub：[QVerisAI/qveris-agent-toolkit](https://github.com/QVerisAI/qveris-agent-toolkit)
 - npm：[@qverisai/cli](https://www.npmjs.com/package/@qverisai/cli)
 - REST API：[docs/zh-CN/rest-api.md](rest-api.md)
 - MCP Server：[docs/zh-CN/mcp-server.md](mcp-server.md)

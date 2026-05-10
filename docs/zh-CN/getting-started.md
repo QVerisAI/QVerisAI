@@ -318,7 +318,7 @@ console.log(data);
 
 ### 在 AI Agent 中安装 QVeris
 
-如果你正在配置 AI 编程助手（Claude Code、Cursor、OpenCode、Trae 等），可以将 [Agent 安装指南](https://github.com/QVerisAI/QVerisAI/blob/main/agent/SETUP.md) 连同你的 API 密钥一起提供给 Agent。它会自动检测运行环境，并完成 MCP 服务器和技能定义的配置。
+如果你正在配置 AI 编程助手（Claude Code、Cursor、OpenCode、Trae 等），可以将 [Agent 安装指南](https://github.com/QVerisAI/qveris-agent-toolkit/blob/main/agent/SETUP.md) 连同你的 API 密钥一起提供给 Agent。它会自动检测运行环境，并完成 MCP 服务器和技能定义的配置。
 
 支持的环境：Claude Code、OpenCode、Cursor、Trae、VS Code、OpenClaw。
 

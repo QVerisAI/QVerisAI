@@ -24,10 +24,10 @@ Configure this for me <配置指南链接>. The API key is <你的 API 密钥>
 
 Claude Code：
 ```
-Configure this for me https://github.com/QVerisAI/QVerisAI/blob/main/docs/claude-code-setup.md. The API key is sk-xxxxxxxxxxxxx
+Configure this for me https://github.com/QVerisAI/qveris-agent-toolkit/blob/main/docs/claude-code-setup.md. The API key is sk-xxxxxxxxxxxxx
 ```
 
 OpenCode：
 ```
-Configure this for me https://github.com/QVerisAI/QVerisAI/blob/main/docs/opencode-setup.md. The API key is sk-xxxxxxxxxxxxx
+Configure this for me https://github.com/QVerisAI/qveris-agent-toolkit/blob/main/docs/opencode-setup.md. The API key is sk-xxxxxxxxxxxxx
 ```
