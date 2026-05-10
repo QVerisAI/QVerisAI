@@ -19,7 +19,9 @@ def prune_tool_history(messages: List[Message], previous_messages_count: int) ->
             for tc in msg.tool_calls:
                 if tc.get('type') == 'function':
                      # Handle both dict and object access safely
-                    func_name = tc['function']['name']
+                    func_name = tc.get('function', {}).get('name')
+                    if not func_name:
+                        continue
                     tool_id_to_name[tc['id']] = func_name
 
     new_messages = []
