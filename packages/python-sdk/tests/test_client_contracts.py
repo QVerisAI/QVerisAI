@@ -97,6 +97,27 @@ async def test_inspect_contract_posts_tool_ids() -> None:
 
 
 @pytest.mark.asyncio
+async def test_inspect_empty_tool_ids_returns_empty_response_without_request() -> None:
+    requested = False
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal requested
+        requested = True
+        return httpx.Response(500, json={"error": f"unexpected request to {request.url.path}"})
+
+    client = make_client(handler)
+    try:
+        response = await client.inspect([], search_id="search-123")
+    finally:
+        await client.close()
+
+    assert requested is False
+    assert response.search_id == "search-123"
+    assert response.total == 0
+    assert response.results == []
+
+
+@pytest.mark.asyncio
 async def test_call_contract_parses_execution_outcome_and_billing() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         assert request.method == "POST"
@@ -144,6 +165,68 @@ async def test_call_contract_parses_execution_outcome_and_billing() -> None:
     assert response.billing.list_amount_credits == 3
     assert response.billing.charge_lines is not None
     assert response.billing.charge_lines[0].component_key == "request"
+
+
+@pytest.mark.asyncio
+async def test_post_methods_unwrap_success_envelopes() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/api/v1/search":
+            return httpx.Response(
+                200,
+                json={"status": "success", "data": {"search_id": "search-123", "results": [], "total": 0}},
+            )
+        if request.url.path == "/api/v1/tools/by-ids":
+            return httpx.Response(
+                200,
+                json={
+                    "status": "success",
+                    "data": {
+                        "search_id": "search-123",
+                        "results": [{"tool_id": "weather.forecast.v1", "description": "Forecast"}],
+                    },
+                },
+            )
+        if request.url.path == "/api/v1/tools/execute":
+            return httpx.Response(
+                200,
+                json={
+                    "status": "success",
+                    "data": {
+                        "execution_id": "exec-123",
+                        "success": True,
+                        "tool_id": "weather.forecast.v1",
+                    },
+                },
+            )
+        raise AssertionError(f"Unexpected path: {request.url.path}")
+
+    client = make_client(handler)
+    try:
+        discover_response = await client.discover("weather forecast API")
+        inspect_response = await client.inspect("weather.forecast.v1", search_id="search-123")
+        call_response = await client.call("weather.forecast.v1", parameters={})
+    finally:
+        await client.close()
+
+    assert discover_response.search_id == "search-123"
+    assert inspect_response.results[0].tool_id == "weather.forecast.v1"
+    assert call_response.execution_id == "exec-123"
+
+
+@pytest.mark.asyncio
+async def test_failure_envelope_raises_before_model_parsing() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={"status": "failure", "message": "quota exhausted", "data": {"unexpected": "shape"}},
+        )
+
+    client = make_client(handler)
+    try:
+        with pytest.raises(RuntimeError, match="quota exhausted"):
+            await client.discover("weather forecast API")
+    finally:
+        await client.close()
 
 
 @pytest.mark.asyncio

@@ -87,8 +87,19 @@ class QverisClient:
         if isinstance(data, dict) and "data" in data and (
             "status" in data or "status_code" in data or "message" in data
         ):
+            status = data.get("status") or data.get("status_code")
+            if self._is_failure_status(status):
+                raise RuntimeError(data.get("message") or "API returned failure status")
             return data["data"]
         return data
+
+    def _is_failure_status(self, status: Any) -> bool:
+        """Return whether an API envelope status represents failure."""
+        if isinstance(status, str):
+            return status.lower() in {"failure", "failed", "error"}
+        if isinstance(status, int):
+            return status >= 400
+        return False
 
     async def close(self):
         """
@@ -127,7 +138,7 @@ class QverisClient:
         response = await self.client.post("search", json=payload)
 
         self._debug(f"[Qveris API] Response status: {response.status_code}")
-        data = self._parse_response_json(response)
+        data = self._unwrap_envelope(self._parse_response_json(response))
         response.raise_for_status()
         return SearchResponse(**data)
 
@@ -153,6 +164,9 @@ class QverisClient:
             `SearchResponse` with full tool details for the requested IDs.
         """
         ids = [tool_ids] if isinstance(tool_ids, str) else list(tool_ids or [])
+        if not ids:
+            return SearchResponse(search_id=search_id, total=0, results=[])
+
         url = self._url_for("POST", "tools/by-ids")
         payload: Dict[str, Any] = {"tool_ids": ids}
         if search_id:
@@ -167,7 +181,7 @@ class QverisClient:
         response = await self.client.post("tools/by-ids", json=payload)
 
         self._debug(f"[Qveris API] Response status: {response.status_code}")
-        data = self._parse_response_json(response)
+        data = self._unwrap_envelope(self._parse_response_json(response))
         response.raise_for_status()
         return SearchResponse(**data)
 
@@ -226,7 +240,7 @@ class QverisClient:
         )
 
         self._debug(f"[Qveris API] Response status: {response.status_code}")
-        data = self._parse_response_json(response)
+        data = self._unwrap_envelope(self._parse_response_json(response))
         response.raise_for_status()
         return ToolExecutionResponse(**data)
 
