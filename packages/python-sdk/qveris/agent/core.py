@@ -4,7 +4,7 @@ Qveris agent runtime.
 This module defines `Agent`, the high-level orchestration layer that connects:
 
 - an LLM provider (`LLMProvider`) capable of emitting tool calls,
-- Qveris built-in tools (`discover`, `call`) exposed to the LLM,
+- Qveris built-in tools (`discover`, `inspect`, `call`) exposed to the LLM,
 - optional user-provided tools and a handler for those tools,
 - and an execution loop that feeds tool results back to the LLM until completion.
 
@@ -41,7 +41,7 @@ from openai import APIConnectionError, APIStatusError, APITimeoutError, Authenti
 from openai.types.chat import ChatCompletionToolParam
 
 from ..client.api import QverisClient
-from ..client.tools import CALL_TOOL_DEF, DEFAULT_SYSTEM_PROMPT, DISCOVER_TOOL_DEF
+from ..client.tools import CALL_TOOL_DEF, DEFAULT_SYSTEM_PROMPT, DISCOVER_TOOL_DEF, INSPECT_TOOL_DEF
 from ..config import AgentConfig, QverisConfig
 from ..llm.base import LLMProvider
 from ..llm.openai import OpenAIProvider
@@ -59,6 +59,7 @@ class Agent:
     The agent runs an LLM/tool loop that can:
 
     - discover capabilities via Qveris (`discover`),
+    - inspect candidate capabilities (`inspect`),
     - call a selected capability (`call`),
     - optionally execute additional user-provided tools (`extra_tools` + `extra_tool_handler`).
 
@@ -106,7 +107,7 @@ class Agent:
             # Fallback to internal OpenAI provider
             self.llm = OpenAIProvider()
 
-        self.tools: List[ChatCompletionToolParam] = [DISCOVER_TOOL_DEF, CALL_TOOL_DEF]
+        self.tools: List[ChatCompletionToolParam] = [DISCOVER_TOOL_DEF, INSPECT_TOOL_DEF, CALL_TOOL_DEF]
         if extra_tools:
             self.tools.extend(extra_tools)
 

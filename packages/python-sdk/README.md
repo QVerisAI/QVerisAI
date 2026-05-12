@@ -13,6 +13,7 @@ QVeris provides a **capability routing** layer for agents:
 The `qveris.Agent` wraps this into a loop that:
 
 - discovers suitable capabilities to complete the task,
+- inspects candidate capabilities when more detail is useful,
 - calls proper capabilities (and your extra tools, if provided),
 - feeds tool outputs back into the LLM until it reaches a final answer.
 
@@ -90,7 +91,7 @@ final_text = await agent.run_to_completion(messages)
 
 If you already have an agent framework (or want full control), you can directly use:
 
-- `qveris.client.tools.SEARCH_TOOL_DEF` / `EXECUTE_TOOL_DEF` to expose tool schemas to your LLM
+- `qveris.client.tools.SEARCH_TOOL_DEF` / `GET_TOOLS_BY_IDS_TOOL_DEF` / `EXECUTE_TOOL_DEF` to expose tool schemas to your LLM
 - `qveris.client.tools.DEFAULT_SYSTEM_PROMPT` as a starting system prompt
 - `qveris.client.api.QverisClient` to handle QVeris tool calls
 
