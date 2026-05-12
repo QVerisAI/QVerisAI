@@ -36,6 +36,7 @@ export async function runInit(queryArg, flags) {
   let selected;
   const query = flags.query || queryArg || DEFAULT_QUERY;
   const limit = parseInt(flags.limit, 10) || DEFAULT_LIMIT;
+  const maxResponseSize = resolveInitMaxResponseSize(flags);
 
   if (flags.resume) {
     const session = readSession();
@@ -108,7 +109,7 @@ export async function runInit(queryArg, flags) {
   record(steps, "call", flags.dryRun ? "skipped" : "running", flags.dryRun ? "Dry run requested" : "Calling selected capability", {
     tool_id: selected.tool_id,
     params_source: paramsSource,
-    max_response_size: DEFAULT_MAX_RESPONSE_SIZE,
+    max_response_size: maxResponseSize,
   });
 
   const nextCommands = buildNextCommands({ selected, discoveryId, parameters });
@@ -126,14 +127,14 @@ export async function runInit(queryArg, flags) {
     toolId: selected.tool_id,
     discoveryId,
     parameters,
-    maxResponseSize: DEFAULT_MAX_RESPONSE_SIZE,
+    maxResponseSize,
     timeoutMs,
   });
 
   if (!callResult.success) {
     const err = new CliError("TOOL_CALL_FAILED", callResult.error_message || "The selected capability returned success=false.");
     if (looksLikeProviderFailure(callResult.error_message)) err.code = "PROVIDER_FAILURE";
-    err.hint = `Rerun with adjusted params: qveris init --resume --params '${JSON.stringify(parameters)}'`;
+    err.hint = `Rerun with adjusted params: qveris init --resume --params ${shellSingleQuote(JSON.stringify(parameters))}`;
     throw err;
   }
 
@@ -200,11 +201,22 @@ function pickInspectedTool(response, toolId) {
   return list.find((t) => t?.tool_id === toolId) || list[0] || null;
 }
 
-function buildNextCommands({ selected, discoveryId, parameters }) {
-  const paramsJson = JSON.stringify(parameters);
+export function resolveInitMaxResponseSize(flags) {
+  if (flags.maxSize === undefined) return DEFAULT_MAX_RESPONSE_SIZE;
+  const parsed = parseInt(flags.maxSize, 10);
+  if (!Number.isFinite(parsed)) throw new CliError("API_ERROR", "Invalid --max-size: must be an integer");
+  return parsed;
+}
+
+export function shellSingleQuote(value) {
+  return `'${String(value).replace(/'/g, "'\\''")}'`;
+}
+
+export function buildNextCommands({ selected, discoveryId, parameters }) {
+  const paramsJson = shellSingleQuote(JSON.stringify(parameters));
   const executionPlaceholder = "<execution_id>";
   return {
-    retry: `qveris call ${selected.tool_id} --discovery-id ${discoveryId} --params '${paramsJson}'`,
+    retry: `qveris call ${selected.tool_id} --discovery-id ${discoveryId} --params ${paramsJson}`,
     usage: `qveris usage --mode search --execution-id ${executionPlaceholder}`,
     ledger: "qveris ledger --mode summary",
   };
