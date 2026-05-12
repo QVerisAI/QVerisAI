@@ -36,6 +36,10 @@ npx @qverisai/cli discover "天气 API"
 ## 快速开始
 
 ```bash
+# 引导式首次调用
+qveris init
+
+# 手动流程
 # 1. 认证（保存到 ~/.config/qveris/config.json）
 qveris login
 
@@ -52,6 +56,34 @@ qveris call 1 --params '{"wfo": "LWX", "x": 90, "y": 90}'
 ---
 
 ## 命令
+
+### `qveris init`
+
+引导式首次调用向导：解析认证、发现能力、检查能力、执行调用，并在最后给出 usage/ledger 对账命令。
+
+```bash
+qveris init [query] [flags]
+```
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `--query <query>` | 覆盖发现查询 | `weather forecast API` |
+| `--params <json\|@file\|->` | 覆盖调用参数 | 能力示例参数（如可用） |
+| `--resume` | 在可恢复失败后复用上一次发现会话 | false |
+| `--dry-run` | 打印计划执行的发现/调用载荷，但不实际调用 | false |
+| `--tool-id <id>` | 指定工具 ID，而不是使用第一个发现结果 | 第一个结果 |
+| `--json` | 输出机器可读的向导状态 | false |
+
+**示例：**
+
+```bash
+qveris init
+qveris init --query "股票价格 API"
+qveris init --dry-run
+qveris init --resume --params '{"city": "London"}'
+```
+
+最后一步会打印精确的 `qveris usage` 和 `qveris ledger` 命令，便于确认最终扣费结果。
 
 ### `qveris discover`
 
@@ -177,6 +209,60 @@ qveris call 1 --params '{"symbol": "AAPL"}' --codegen js
 - 提示：`使用 --max-size -1 获取完整输出`
 
 智能体/脚本场景（`--json` 或管道输出）默认提高到 20KB。用 `--max-size -1` 获取完整结果。
+
+---
+
+### `qveris mcp configure`
+
+为 Cursor、Claude Desktop、Claude Code、OpenCode、OpenClaw 或通用 stdio 客户端生成 MCP 配置。默认是打印模式，并使用 `YOUR_QVERIS_API_KEY` 占位符，因此输出可以安全粘贴到 issue 或文档中。占位符输出会故意无法通过 API key 校验，直到你替换占位符或使用 `--include-key`。
+
+```bash
+qveris mcp configure --target cursor
+qveris mcp configure --target cursor --write --include-key
+qveris mcp configure --target claude-desktop --write --include-key
+qveris mcp configure --target opencode --write --include-key
+qveris mcp configure --target openclaw --write --include-key
+qveris mcp configure --target claude-code
+qveris mcp configure --target generic --json
+```
+
+支持的目标：
+
+| 目标 | 输出 |
+|------|------|
+| `cursor` | `~/.cursor/mcp.json` |
+| `claude-desktop` | Claude Desktop MCP 配置 |
+| `claude-code` | `claude mcp add` 命令 |
+| `opencode` | OpenCode 本地 MCP 配置 |
+| `openclaw` | OpenClaw qveris 插件配置 |
+| `generic` | 原始 stdio server JSON |
+
+参数：
+
+| 参数 | 说明 |
+|------|------|
+| `--target <target>` | 目标客户端，默认 `cursor` |
+| `--output <path>` | 覆盖配置输出路径 |
+| `--write` | 将生成的配置写入磁盘 |
+| `--include-key` | 使用解析到的 API key，而不是占位符 |
+| `--json` | 输出机器可读 JSON |
+
+### `qveris mcp validate`
+
+校验 MCP 配置文件。静态校验会检查配置结构、QVeris 条目、API key 绑定方式，以及预期的规范工具。
+
+```bash
+qveris mcp validate --target cursor
+qveris mcp validate --target cursor --output ~/.cursor/mcp.json
+```
+
+添加 `--probe` 会启动配置中的 stdio MCP server，并通过 `tools/list` 确认 `discover`、`inspect`、`call` 工具可见。
+
+```bash
+qveris mcp validate --target cursor --probe
+```
+
+`--probe` 需要可执行的 stdio 命令和真实的 `QVERIS_API_KEY`；OpenClaw 插件配置不支持该探测方式。
 
 ---
 

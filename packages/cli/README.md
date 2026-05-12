@@ -2,6 +2,12 @@
 
 Discover, inspect, and call 10,000+ API capabilities from your terminal.
 
+New users can run the guided first-call wizard:
+
+```bash
+qveris init
+```
+
 ```
 $ qveris discover "weather forecast API"
 Found 5 capabilities matching your query
@@ -81,6 +87,10 @@ Requires Node.js 18+.
 ## Quick Start
 
 ```bash
+# Guided path: auth → discover → inspect → call → usage/ledger guidance
+qveris init
+
+# Manual path
 # 1. Authenticate
 qveris login
 
@@ -100,6 +110,7 @@ qveris call 1 --params '{"wfo": "LWX", "x": 90, "y": 90}'
 
 | Command | Description |
 |---------|-------------|
+| `qveris init` | Guided first-call wizard: auth, discover, inspect, call, and usage/ledger reconciliation guidance. |
 | `qveris discover <query>` | Find capabilities by natural language. Shows tool ID, provider, description, relevance, success rate, latency, and billing rule when available. |
 | `qveris inspect <id\|index>` | View full tool details: parameters (type, required, description, enum values), example, provider info, execution history. |
 | `qveris call <id\|index>` | Execute a capability. Shows result data, execution time, pre-settlement billing, and remaining credits. |
@@ -122,9 +133,25 @@ qveris call 1 --params '{"wfo": "LWX", "x": 90, "y": 90}'
 | `qveris interactive` | Launch REPL mode (discover/inspect/call/codegen in one session) |
 | `qveris doctor` | Self-check: Node.js version, API key, region, connectivity |
 | `qveris config <subcommand>` | Manage CLI settings (set, get, list, reset, path) |
+| `qveris mcp configure` | Generate MCP client config for Cursor, Claude Desktop/Code, OpenCode, OpenClaw, or generic stdio |
+| `qveris mcp validate` | Validate an MCP config file, with optional live stdio tool probing |
 | `qveris completions <shell>` | Generate shell completions (bash/zsh/fish) |
 
 ## Usage
+
+### Init
+
+Run the guided first-call wizard:
+
+```bash
+qveris init
+qveris init --query "weather forecast API"
+qveris init --dry-run
+qveris init --resume --params '{"city": "London"}'
+qveris init --json
+```
+
+`init` discovers a capability, inspects the selected result, calls it with sample parameters when available, and ends with exact `usage` / `ledger` commands so you can reconcile final billing. Use `--resume` after recoverable parameter or provider failures to reuse the last discovery session.
 
 ### Discover
 
@@ -204,6 +231,37 @@ Preview:
 ```
 
 For agent/script use (`--json` or piped output), the default increases to 20KB (matching the MCP server). Use `--max-size -1` for unlimited.
+
+### MCP Configuration
+
+Generate MCP client config without hand-editing JSON. Print mode is the default and uses `YOUR_QVERIS_API_KEY` placeholders so the output is safe to share. Placeholder output intentionally fails API key validation until you replace it or use `--include-key`.
+
+```bash
+# Print safe config for Cursor
+qveris mcp configure --target cursor
+
+# Write a working Cursor config using your resolved API key
+qveris mcp configure --target cursor --write --include-key
+
+# Other supported targets
+qveris mcp configure --target claude-desktop --write --include-key
+qveris mcp configure --target opencode --write --include-key
+qveris mcp configure --target openclaw --write --include-key
+qveris mcp configure --target claude-code
+qveris mcp configure --target generic --json
+```
+
+Validate an existing config:
+
+```bash
+# Static config validation
+qveris mcp validate --target cursor
+
+# Live stdio probe: starts the MCP server and confirms discover/inspect/call are visible
+qveris mcp validate --target cursor --probe
+```
+
+Supported targets: `cursor`, `claude-desktop`, `claude-code`, `opencode`, `openclaw`, `generic`.
 
 ### Usage Audit
 
@@ -342,6 +400,11 @@ qveris completions fish | source
 | `--api-key <key>` | | Override API key |
 | `--timeout <seconds>` | | Request timeout |
 | `--max-size <bytes>` | | Response size limit (-1 = unlimited) |
+| `--target <target>` | | MCP target |
+| `--output <path>` | | MCP config output path |
+| `--write` | | Write MCP config to disk |
+| `--include-key` | | Include resolved API key instead of a placeholder |
+| `--probe` | | Live-probe MCP tools during validation |
 | `--no-color` | | Disable colors |
 | `--version` | `-V` | Print version |
 | `--help` | `-h` | Show help |

@@ -25,17 +25,17 @@ Debug logs redact the token value.
 """
 
 import json
-from typing import Any, Callable, Dict, Iterable, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, Optional, Tuple, Union
 
 import httpx
 
 from ..config import QverisConfig
 from ..types import CreditsLedgerResponse, SearchResponse, ToolExecutionResponse, UsageHistoryResponse
 
+
 class QverisClient:
-    """
-    Async client for Qveris API.
-    """
+    """Async client for Qveris API."""
+
     def __init__(self, config: Optional[QverisConfig] = None, debug_callback: Optional[Callable[[str], None]] = None):
         self.config = config or QverisConfig()
         self.debug_callback = debug_callback
@@ -45,16 +45,16 @@ class QverisClient:
         if self.config.api_key:
             self.headers["Authorization"] = f"Bearer {self.config.api_key}"
 
-        # httpx automatically respects HTTP_PROXY/HTTPS_PROXY env vars
+        # httpx automatically respects HTTP_PROXY/HTTPS_PROXY env vars.
         self.base_url = self.config.base_url.rstrip("/") + "/"
         self.client = httpx.AsyncClient(
             base_url=self.base_url,
             headers=self.headers,
-            timeout=60.0
+            timeout=60.0,
         )
 
     def _debug(self, message: str):
-        """Print debug message if callback is set"""
+        """Print debug message if callback is set."""
         if self.debug_callback:
             self.debug_callback(message)
 
@@ -126,28 +126,28 @@ class QverisClient:
         response.raise_for_status()
         return SearchResponse(**data)
 
-    async def search_tools(self, query: str, limit: int = 100, session_id: Optional[str] = None) -> SearchResponse:
+    async def search_tools(self, query: str, limit: int = 20, session_id: Optional[str] = None) -> SearchResponse:
         """Deprecated alias for `discover(...)`."""
         return await self.discover(query=query, limit=limit, session_id=session_id)
 
     async def inspect(
         self,
-        tool_ids: Iterable[str],
+        tool_ids: Union[Iterable[str], str],
         search_id: Optional[str] = None,
-        session_id: Optional[str] = None
+        session_id: Optional[str] = None,
     ) -> SearchResponse:
         """
         Inspect one or more capabilities by tool ID.
 
         Args:
-            tool_ids: Tool IDs returned by `discover(...)`.
+            tool_ids: Tool IDs returned by `discover(...)`. A single string is accepted.
             search_id: Optional search ID that produced the tools.
             session_id: Optional correlation ID.
 
         Returns:
             `SearchResponse` with full tool details for the requested IDs.
         """
-        ids = list(tool_ids)
+        ids = [tool_ids] if isinstance(tool_ids, str) else list(tool_ids or [])
         url = self._url_for("tools/by-ids")
         payload: Dict[str, Any] = {"tool_ids": ids}
         if search_id:
@@ -168,29 +168,12 @@ class QverisClient:
 
     async def get_tools_by_ids(
         self,
-        tool_ids: Iterable[str],
+        tool_ids: Union[Iterable[str], str],
         search_id: Optional[str] = None,
-        session_id: Optional[str] = None
+        session_id: Optional[str] = None,
     ) -> SearchResponse:
         """Deprecated alias for `inspect(...)`."""
         return await self.inspect(tool_ids=tool_ids, search_id=search_id, session_id=session_id)
-
-    async def execute_tool(
-        self,
-        tool_id: str,
-        parameters: Dict[str, Any],
-        search_id: Optional[str] = None,
-        session_id: Optional[str] = None,
-        max_response_size: Optional[int] = None
-    ) -> ToolExecutionResponse:
-        """Deprecated alias for `call(...)`."""
-        return await self.call(
-            tool_id=tool_id,
-            parameters=parameters,
-            search_id=search_id,
-            session_id=session_id,
-            max_response_size=max_response_size,
-        )
 
     async def call(
         self,
@@ -198,7 +181,7 @@ class QverisClient:
         parameters: Dict[str, Any],
         search_id: Optional[str] = None,
         session_id: Optional[str] = None,
-        max_response_size: Optional[int] = None
+        max_response_size: Optional[int] = None,
     ) -> ToolExecutionResponse:
         """
         Call a specific capability.
@@ -214,8 +197,8 @@ class QverisClient:
             `ToolExecutionResponse` with `success`, `result`, and metadata.
         """
         url = self._url_for("tools/execute", params={"tool_id": tool_id})
-        payload = {
-            "parameters": parameters
+        payload: Dict[str, Any] = {
+            "parameters": parameters,
         }
 
         if search_id:
@@ -224,7 +207,7 @@ class QverisClient:
         if session_id:
             payload["session_id"] = session_id
 
-        if max_response_size:
+        if max_response_size is not None:
             payload["max_response_size"] = max_response_size
 
         self._debug(f"[Qveris API] POST {url}")
@@ -234,13 +217,30 @@ class QverisClient:
         response = await self.client.post(
             "tools/execute",
             params={"tool_id": tool_id},
-            json=payload
+            json=payload,
         )
 
         self._debug(f"[Qveris API] Response status: {response.status_code}")
         data = self._parse_response_json(response)
         response.raise_for_status()
         return ToolExecutionResponse(**data)
+
+    async def execute_tool(
+        self,
+        tool_id: str,
+        parameters: Dict[str, Any],
+        search_id: Optional[str] = None,
+        session_id: Optional[str] = None,
+        max_response_size: Optional[int] = None,
+    ) -> ToolExecutionResponse:
+        """Deprecated alias for `call(...)`."""
+        return await self.call(
+            tool_id=tool_id,
+            parameters=parameters,
+            search_id=search_id,
+            session_id=session_id,
+            max_response_size=max_response_size,
+        )
 
     async def usage(
         self,
@@ -338,7 +338,7 @@ class QverisClient:
         self,
         func_name: str,
         func_args: Dict[str, Any],
-        session_id: Optional[str] = None
+        session_id: Optional[str] = None,
     ) -> Tuple[Any, bool, bool]:
         """
         Handle a built-in Qveris tool call from an LLM response.
@@ -360,41 +360,43 @@ class QverisClient:
               callers can route to their own tool handlers.
         """
         try:
-            if func_name in ("discover", "search_tools"):
+            if func_name in {"discover", "search_tools"}:
                 result = await self.discover(
                     query=func_args.get("query"),
-                    limit=func_args.get("limit", 10),
-                    session_id=session_id
+                    limit=func_args.get("limit", 20),
+                    session_id=session_id,
                 )
                 return result.model_dump(), False, True
 
-            elif func_name in ("inspect", "get_tools_by_ids"):
+            if func_name in {"inspect", "get_tools_by_ids"}:
                 result = await self.inspect(
                     tool_ids=func_args.get("tool_ids") or [],
                     search_id=func_args.get("search_id"),
-                    session_id=session_id
+                    session_id=session_id,
                 )
                 return result.model_dump(), False, True
 
-            elif func_name in ("call", "execute_tool"):
-                params_str = func_args.get("params_to_tool")
-                try:
-                    params = json.loads(params_str) if isinstance(params_str, str) else params_str or {}
-                except (json.JSONDecodeError, TypeError):
-                    params = {}
+            if func_name in {"call", "execute_tool"}:
+                params_val = func_args.get("params_to_tool")
+                if isinstance(params_val, str):
+                    try:
+                        params = json.loads(params_val) if params_val else {}
+                    except json.JSONDecodeError as e:
+                        return {"error": f"Invalid JSON in params_to_tool: {e}"}, True, True
+                else:
+                    params = params_val if isinstance(params_val, dict) else {}
 
                 result = await self.call(
                     tool_id=func_args.get("tool_id"),
                     parameters=params,
                     search_id=func_args.get("search_id"),
                     session_id=session_id,
-                    max_response_size=func_args.get("max_response_size")
+                    max_response_size=func_args.get("max_response_size"),
                 )
                 return result.model_dump(), False, True
 
-            else:
-                # Not a Qveris tool
-                return None, False, False
+            # Not a Qveris tool.
+            return None, False, False
 
         except httpx.HTTPStatusError as e:
             return {"error": f"HTTP {e.response.status_code}: {e.response.text[:500]}"}, True, True

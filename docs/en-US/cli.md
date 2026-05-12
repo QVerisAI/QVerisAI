@@ -36,6 +36,10 @@ npx @qverisai/cli discover "weather API"
 ## Quick Start
 
 ```bash
+# Guided first call
+qveris init
+
+# Manual flow
 # 1. Authenticate (saves key to ~/.config/qveris/config.json)
 qveris login
 
@@ -52,6 +56,34 @@ qveris call 1 --params '{"wfo": "LWX", "x": 90, "y": 90}'
 ---
 
 ## Commands
+
+### `qveris init`
+
+Guided first-call wizard: resolve auth, discover a capability, inspect it, call it, and finish with usage/ledger reconciliation guidance.
+
+```bash
+qveris init [query] [flags]
+```
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--query <query>` | Discovery query override | `weather forecast API` |
+| `--params <json\|@file\|->` | Call parameters override | sample parameters when available |
+| `--resume` | Reuse the last discovery session after a recoverable failure | false |
+| `--dry-run` | Print planned discovery/call payload without executing the call | false |
+| `--tool-id <id>` | Select a specific tool ID instead of the first result | first result |
+| `--json` | Output machine-readable wizard state | false |
+
+**Examples:**
+
+```bash
+qveris init
+qveris init --query "stock price API"
+qveris init --dry-run
+qveris init --resume --params '{"city": "London"}'
+```
+
+The final step prints exact `qveris usage` and `qveris ledger` commands so you can reconcile the call.
 
 ### `qveris discover`
 
@@ -177,6 +209,60 @@ For terminal use (TTY), results larger than 4KB are automatically truncated. The
 - A hint: `Use --max-size -1 for full output`
 
 For agent/script use (`--json` or piped output), the default increases to 20KB. Use `--max-size -1` for unlimited.
+
+---
+
+### `qveris mcp configure`
+
+Generate MCP client configuration for Cursor, Claude Desktop, Claude Code, OpenCode, OpenClaw, or a generic stdio client. Print mode is the default and uses `YOUR_QVERIS_API_KEY` placeholders so the output is safe to paste into issues or docs. Placeholder output intentionally fails API key validation until you replace it or use `--include-key`.
+
+```bash
+qveris mcp configure --target cursor
+qveris mcp configure --target cursor --write --include-key
+qveris mcp configure --target claude-desktop --write --include-key
+qveris mcp configure --target opencode --write --include-key
+qveris mcp configure --target openclaw --write --include-key
+qveris mcp configure --target claude-code
+qveris mcp configure --target generic --json
+```
+
+Supported targets:
+
+| Target | Output |
+|--------|--------|
+| `cursor` | `~/.cursor/mcp.json` |
+| `claude-desktop` | Claude Desktop MCP config |
+| `claude-code` | `claude mcp add` command |
+| `opencode` | OpenCode local MCP config |
+| `openclaw` | OpenClaw qveris plugin config |
+| `generic` | Raw stdio server JSON |
+
+Flags:
+
+| Flag | Description |
+|------|-------------|
+| `--target <target>` | Target client. Defaults to `cursor` |
+| `--output <path>` | Override config output path |
+| `--write` | Write the generated config to disk |
+| `--include-key` | Include the resolved API key instead of the placeholder |
+| `--json` | Output machine-readable JSON |
+
+### `qveris mcp validate`
+
+Validate an MCP config file. Static validation checks config shape, QVeris entry presence, API key wiring, and expected canonical tools.
+
+```bash
+qveris mcp validate --target cursor
+qveris mcp validate --target cursor --output ~/.cursor/mcp.json
+```
+
+Add `--probe` to start the configured stdio server and confirm the `discover`, `inspect`, and `call` tools are visible via `tools/list`.
+
+```bash
+qveris mcp validate --target cursor --probe
+```
+
+`--probe` requires a runnable stdio command and a real `QVERIS_API_KEY`; it is not available for OpenClaw plugin configs.
 
 ---
 

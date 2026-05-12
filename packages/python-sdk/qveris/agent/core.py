@@ -408,7 +408,7 @@ class Agent:
         """
         Create and set a new session id.
 
-        The session id is forwarded to Qveris API calls (search/execute) and can be used server-side
+        The session id is forwarded to Qveris API calls (discover/call) and can be used server-side
         for correlation, tracing, and analytics.
         """
         self.session_id = str(uuid.uuid4())
