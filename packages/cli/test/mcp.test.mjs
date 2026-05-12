@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { chmodSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { platform, tmpdir } from "node:os";
 import { join } from "node:path";
@@ -9,6 +11,25 @@ import {
   shellQuoteForPlatform,
   writeTargetConfig,
 } from "../src/commands/mcp.mjs";
+
+const CLI_PATH = fileURLToPath(new URL("../bin/qveris.mjs", import.meta.url));
+
+function runCli(args) {
+  const env = { ...process.env, NO_COLOR: "1" };
+  delete env.QVERIS_API_KEY;
+  delete env.QVERIS_BASE_URL;
+  delete env.QVERIS_REGION;
+  return spawnSync(process.execPath, [CLI_PATH, ...args], {
+    cwd: fileURLToPath(new URL("..", import.meta.url)),
+    encoding: "utf8",
+    env,
+  });
+}
+
+function parseCliJson(result) {
+  assert.equal(result.stderr, "");
+  return JSON.parse(result.stdout);
+}
 
 test("mcp configure enforces owner-only permissions on existing config files", () => {
   const dir = mkdtempSync(join(tmpdir(), "qveris-cli-mcp-"));
@@ -48,4 +69,192 @@ test("mcp live probe enables shell execution on Windows only", () => {
 test("mcp command quoting follows the target shell platform", () => {
   assert.equal(shellQuoteForPlatform("L'Ondon", "darwin"), `'L'\\''Ondon'`);
   assert.equal(shellQuoteForPlatform('say "hi"', "win32"), `"say ""hi"""`);
+});
+
+test("mcp configure emits valid JSON fragments for each supported target", () => {
+  const targets = ["cursor", "claude-desktop", "opencode", "openclaw", "generic", "claude-code"];
+  for (const target of targets) {
+    const result = runCli([
+      "mcp",
+      "configure",
+      target,
+      "--api-key",
+      "sk-test",
+      "--base-url",
+      "https://unit.test/api/v1/",
+      "--include-key",
+      "--json",
+    ]);
+    assert.equal(result.status, 0, result.stderr);
+    const payload = parseCliJson(result);
+
+    assert.equal(payload.target, target);
+    assert.equal(payload.wrote, false);
+    assert.equal(payload.includes_real_api_key, true);
+    assert.equal(payload.base_url, "https://unit.test/api/v1");
+    assert.deepEqual(payload.expected_tools, ["discover", "inspect", "call", "usage_history", "credits_ledger"]);
+    assert.equal(payload.validation.ok, true);
+
+    if (target === "cursor" || target === "claude-desktop") {
+      assert.equal(payload.config.mcpServers.qveris.command, "npx");
+      assert.deepEqual(payload.config.mcpServers.qveris.args, ["-y", "@qverisai/mcp"]);
+      assert.equal(payload.config.mcpServers.qveris.env.QVERIS_API_KEY, "sk-test");
+    } else if (target === "opencode") {
+      assert.deepEqual(payload.config.mcp.qveris.command, ["npx", "-y", "@qverisai/mcp"]);
+      assert.equal(payload.config.mcp.qveris.environment.QVERIS_API_KEY, "sk-test");
+      assert.equal(payload.config.tools["qveris*"], true);
+    } else if (target === "openclaw") {
+      assert.deepEqual(payload.config.plugins.allow, ["qveris"]);
+      assert.equal(payload.config.plugins.entries.qveris.config.apiKey, "sk-test");
+      assert.deepEqual(payload.config.tools.alsoAllow, ["qveris"]);
+    } else if (target === "generic") {
+      assert.equal(payload.config.command, "npx");
+      assert.equal(payload.config.env.QVERIS_API_KEY, "sk-test");
+    } else if (target === "claude-code") {
+      assert.match(payload.config.command, /claude mcp add qveris/);
+      assert.match(payload.config.command, /@qverisai\/mcp/);
+      assert.match(payload.config.windows_command, /cmd \/c npx -y @qverisai\/mcp/);
+      assert.match(payload.config.windows_command, /QVERIS_BASE_URL="https:\/\/unit\.test\/api\/v1"/);
+    }
+  }
+});
+
+test("mcp command is reachable through the CLI and parses target flags", () => {
+  const result = runCli(["mcp", "configure", "--target", "generic", "--json"]);
+  assert.equal(result.status, 0, result.stderr);
+  const payload = parseCliJson(result);
+
+  assert.equal(payload.target, "generic");
+  assert.equal(payload.safe_to_share, true);
+  assert.equal(payload.config.env.QVERIS_API_KEY, "YOUR_QVERIS_API_KEY");
+});
+
+test("mcp configure write merges cursor config and validate reads it back", () => {
+  const dir = mkdtempSync(join(tmpdir(), "qveris-cli-mcp-"));
+  try {
+    const path = join(dir, "cursor-mcp.json");
+    writeFileSync(path, JSON.stringify({
+      mcpServers: {
+        existing: { command: "node", args: ["server.js"], env: { TOKEN: "keep" } },
+      },
+    }, null, 2) + "\n");
+
+    const configureResult = runCli([
+      "mcp",
+      "configure",
+      "--target",
+      "cursor",
+      "--output",
+      path,
+      "--write",
+      "--include-key",
+      "--api-key",
+      "sk-test",
+      "--json",
+    ]);
+    assert.equal(configureResult.status, 0, configureResult.stderr);
+    const configured = parseCliJson(configureResult);
+    const fileConfig = JSON.parse(readFileSync(path, "utf8"));
+
+    assert.equal(configured.wrote, true);
+    assert.equal(configured.validation.ok, true);
+    assert.equal(fileConfig.mcpServers.existing.env.TOKEN, "keep");
+    assert.equal(fileConfig.mcpServers.qveris.env.QVERIS_API_KEY, "sk-test");
+
+    const validateResult = runCli(["mcp", "validate", "--target", "cursor", "--output", path, "--json"]);
+    assert.equal(validateResult.status, 0, validateResult.stderr);
+    const validated = parseCliJson(validateResult);
+
+    assert.equal(validated.ok, true);
+    assert.deepEqual(
+      validated.checks.map((item) => [item.name, item.ok]),
+      [
+        ["config_present", true],
+        ["qveris_entry", true],
+        ["uses_qveris_mcp", true],
+        ["api_key_env", true],
+      ]
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("mcp validate reports placeholder keys as invalid configs", () => {
+  const dir = mkdtempSync(join(tmpdir(), "qveris-cli-mcp-"));
+  try {
+    const path = join(dir, "generic-mcp.json");
+    const configureResult = runCli(["mcp", "configure", "--target", "generic", "--output", path, "--write", "--json"]);
+    assert.equal(configureResult.status, 0, configureResult.stderr);
+
+    const validateResult = runCli(["mcp", "validate", "--target", "generic", "--output", path, "--json"]);
+    assert.equal(validateResult.status, 1, validateResult.stderr);
+    const payload = parseCliJson(validateResult);
+
+    assert.equal(payload.ok, false);
+    assert.equal(payload.checks.find((item) => item.name === "api_key_env").ok, false);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("mcp validate probe verifies visible stdio tools", () => {
+  const dir = mkdtempSync(join(tmpdir(), "qveris-cli-mcp-"));
+  try {
+    const serverPath = join(dir, "fake-mcp-server.mjs");
+    const configPath = join(dir, "generic-mcp.json");
+    writeFileSync(serverPath, `
+import readline from "node:readline";
+
+const rl = readline.createInterface({ input: process.stdin });
+rl.on("line", (line) => {
+  const message = JSON.parse(line);
+  if (message.id === 1) {
+    console.log(JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      result: {
+        protocolVersion: "2024-11-05",
+        capabilities: {},
+        serverInfo: { name: "fake-qveris-mcp", version: "1.0.0" }
+      }
+    }));
+  }
+  if (message.id === 2) {
+    console.log(JSON.stringify({
+      jsonrpc: "2.0",
+      id: 2,
+      result: { tools: [{ name: "discover" }, { name: "inspect" }, { name: "call" }] }
+    }));
+  }
+});
+`);
+    writeFileSync(configPath, JSON.stringify({
+      command: process.execPath,
+      args: [serverPath, "--package=@qverisai/mcp"],
+      env: { QVERIS_API_KEY: "sk-test" },
+    }, null, 2) + "\n");
+
+    const result = runCli([
+      "mcp",
+      "validate",
+      "--target",
+      "generic",
+      "--output",
+      configPath,
+      "--probe",
+      "--timeout",
+      "2",
+      "--json",
+    ]);
+    assert.equal(result.status, 0, result.stderr);
+    const payload = parseCliJson(result);
+
+    assert.equal(payload.ok, true);
+    assert.equal(payload.probe.ok, true);
+    assert.deepEqual(payload.probe.tool_names, ["discover", "inspect", "call"]);
+    assert.equal(payload.checks.find((item) => item.name === "tools_visible").ok, true);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
