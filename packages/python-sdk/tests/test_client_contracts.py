@@ -231,6 +231,39 @@ async def test_ledger_contract_unwraps_envelope_and_filters() -> None:
     assert response.summary == {"net_credits": -3}
 
 
+@pytest.mark.asyncio
+async def test_account_audit_debug_logs_include_get_url_headers_and_body() -> None:
+    debug_logs = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/api/v1/auth/usage/history/v2":
+            return httpx.Response(
+                200,
+                json={"items": [], "total": 0, "page": 1, "page_size": 0},
+            )
+        if request.url.path == "/api/v1/auth/credits/ledger":
+            return httpx.Response(
+                200,
+                json={"items": [], "total": 0, "page": 1, "page_size": 0},
+            )
+        raise AssertionError(f"Unexpected path: {request.url.path}")
+
+    client = make_client(handler)
+    client.debug_callback = debug_logs.append
+    try:
+        await client.usage(execution_id="exec-123", summary=True)
+        await client.ledger(direction="consume", summary=True)
+    finally:
+        await client.close()
+
+    joined = "\n".join(debug_logs)
+    assert "[Qveris API] GET https://qveris.ai/api/v1/auth/usage/history/v2" in joined
+    assert "[Qveris API] GET https://qveris.ai/api/v1/auth/credits/ledger" in joined
+    assert '"Authorization": "Bearer ***"' in joined
+    assert "sk-test" not in joined
+    assert "[Qveris API] Response body:" in joined
+
+
 def test_canonical_tool_definitions_are_exported() -> None:
     assert DISCOVER_TOOL_DEF["function"]["name"] == "discover"
     assert INSPECT_TOOL_DEF["function"]["name"] == "inspect"

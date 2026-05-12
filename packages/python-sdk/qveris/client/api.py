@@ -69,9 +69,14 @@ class QverisClient:
             response.raise_for_status()
             raise
 
-    def _url_for(self, path: str, params: Optional[Dict[str, Any]] = None) -> str:
+    def _url_for(self, method: str, path: str, params: Optional[Dict[str, Any]] = None) -> str:
         """Build the effective request URL using the same httpx client settings."""
-        return str(self.client.build_request("POST", path, params=params).url)
+        return str(self.client.build_request(method, path, params=params).url)
+
+    def _debug_headers(self) -> None:
+        """Log request headers with authorization redacted."""
+        headers = {k: v if k != "Authorization" else "Bearer ***" for k, v in self.headers.items()}
+        self._debug(f"[Qveris API] Headers: {json.dumps(headers, indent=2)}")
 
     def _query_params(self, **kwargs: Any) -> Dict[str, Any]:
         """Drop None-valued query params while preserving falsey filters like 0 and False."""
@@ -106,7 +111,7 @@ class QverisClient:
         Returns:
             `SearchResponse` containing `results` (tools) and `search_id` used for execution.
         """
-        url = self._url_for("search")
+        url = self._url_for("POST", "search")
         payload = {
             "query": query,
             "limit": limit,
@@ -117,7 +122,7 @@ class QverisClient:
 
         self._debug(f"[Qveris API] POST {url}")
         self._debug(f"[Qveris API] Request body: {json.dumps(payload, indent=2)}")
-        self._debug(f"[Qveris API] Headers: {json.dumps({k: v if k != 'Authorization' else 'Bearer ***' for k, v in self.headers.items()}, indent=2)}")
+        self._debug_headers()
 
         response = await self.client.post("search", json=payload)
 
@@ -148,7 +153,7 @@ class QverisClient:
             `SearchResponse` with full tool details for the requested IDs.
         """
         ids = [tool_ids] if isinstance(tool_ids, str) else list(tool_ids or [])
-        url = self._url_for("tools/by-ids")
+        url = self._url_for("POST", "tools/by-ids")
         payload: Dict[str, Any] = {"tool_ids": ids}
         if search_id:
             payload["search_id"] = search_id
@@ -157,7 +162,7 @@ class QverisClient:
 
         self._debug(f"[Qveris API] POST {url}")
         self._debug(f"[Qveris API] Request body: {json.dumps(payload, indent=2)}")
-        self._debug(f"[Qveris API] Headers: {json.dumps({k: v if k != 'Authorization' else 'Bearer ***' for k, v in self.headers.items()}, indent=2)}")
+        self._debug_headers()
 
         response = await self.client.post("tools/by-ids", json=payload)
 
@@ -196,7 +201,7 @@ class QverisClient:
         Returns:
             `ToolExecutionResponse` with `success`, `result`, and metadata.
         """
-        url = self._url_for("tools/execute", params={"tool_id": tool_id})
+        url = self._url_for("POST", "tools/execute", params={"tool_id": tool_id})
         payload: Dict[str, Any] = {
             "parameters": parameters,
         }
@@ -212,7 +217,7 @@ class QverisClient:
 
         self._debug(f"[Qveris API] POST {url}")
         self._debug(f"[Qveris API] Request body: {json.dumps(payload, indent=2)}")
-        self._debug(f"[Qveris API] Headers: {json.dumps({k: v if k != 'Authorization' else 'Bearer ***' for k, v in self.headers.items()}, indent=2)}")
+        self._debug_headers()
 
         response = await self.client.post(
             "tools/execute",
@@ -285,7 +290,8 @@ class QverisClient:
             page_size=page_size,
         )
 
-        self._debug(f"[Qveris API] GET {self.client.build_request('GET', 'auth/usage/history/v2', params=params).url}")
+        self._debug(f"[Qveris API] GET {self._url_for('GET', 'auth/usage/history/v2', params=params)}")
+        self._debug_headers()
         response = await self.client.get("auth/usage/history/v2", params=params)
         self._debug(f"[Qveris API] Response status: {response.status_code}")
         data = self._unwrap_envelope(self._parse_response_json(response))
@@ -327,7 +333,8 @@ class QverisClient:
             page_size=page_size,
         )
 
-        self._debug(f"[Qveris API] GET {self.client.build_request('GET', 'auth/credits/ledger', params=params).url}")
+        self._debug(f"[Qveris API] GET {self._url_for('GET', 'auth/credits/ledger', params=params)}")
+        self._debug_headers()
         response = await self.client.get("auth/credits/ledger", params=params)
         self._debug(f"[Qveris API] Response status: {response.status_code}")
         data = self._unwrap_envelope(self._parse_response_json(response))
