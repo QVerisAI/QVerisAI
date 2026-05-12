@@ -34,7 +34,7 @@ DEFAULT_SYSTEM_PROMPT = (
     'First think about what kind of capabilities might be useful to accomplish the user\'s task. '
     'Then use the discover tool with a query describing the capability, not the specific parameters you will pass later. '
     'Then call suitable capabilities using the call tool, passing parameters through params_to_tool. '
-    'If a capability has success_rate, weighted_success_rate, or avg_execution_time, consider those signals when selecting what to call. '
+    'If a capability has success_rate or avg_execution_time_ms, consider those signals when selecting what to call. '
     'You can reference the examples given for each capability. '
     'You may make multiple tool calls in a single response. '
 )
