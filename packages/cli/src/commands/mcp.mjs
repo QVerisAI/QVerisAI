@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { homedir, platform } from "node:os";
 import { spawn } from "node:child_process";
@@ -149,11 +149,11 @@ function buildTargetFragment(target, { apiKey, baseUrl, includeKey }) {
   }
 
   if (target === "claude-code") {
-    const envArgs = [`--env QVERIS_API_KEY=${shellQuote(apiKey)}`];
-    if (env.QVERIS_BASE_URL) envArgs.push(`--env QVERIS_BASE_URL=${shellQuote(env.QVERIS_BASE_URL)}`);
+    const envArgs = buildClaudeCodeEnvArgs(env, platform());
+    const windowsEnvArgs = buildClaudeCodeEnvArgs(env, "win32");
     return {
       command: `claude mcp add qveris --transport stdio --scope user ${envArgs.join(" ")} -- npx -y @qverisai/mcp`,
-      windows_command: `claude mcp add qveris --transport stdio --scope user ${envArgs.join(" ")} -- cmd /c npx -y @qverisai/mcp`,
+      windows_command: `claude mcp add qveris --transport stdio --scope user ${windowsEnvArgs.join(" ")} -- cmd /c npx -y @qverisai/mcp`,
     };
   }
 
@@ -174,11 +174,12 @@ function buildPrintablePayload(target, { fragment, outputPath, includeKey, baseU
   };
 }
 
-function writeTargetConfig(target, path, fragment) {
+export function writeTargetConfig(target, path, fragment) {
   const existing = existsSync(path) ? readJsonFile(path) : {};
   const merged = mergeConfig(target, existing, fragment);
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, JSON.stringify(merged, null, 2) + "\n", { mode: 0o600 });
+  if (platform() !== "win32") chmodSync(path, 0o600);
   return { path, config: merged };
 }
 
@@ -349,10 +350,7 @@ function stdioSpecFromServer(target, server) {
 
 function listMcpTools(spec, timeoutMs) {
   return new Promise((resolve, reject) => {
-    const child = spawn(spec.command, spec.args || [], {
-      env: { ...process.env, ...(spec.env || {}) },
-      stdio: ["pipe", "pipe", "pipe"],
-    });
+    const child = spawn(spec.command, spec.args || [], mcpSpawnOptions(spec.env));
     let stdout = "";
     let stderr = "";
     let settled = false;
@@ -441,6 +439,14 @@ function listMcpTools(spec, timeoutMs) {
   });
 }
 
+export function mcpSpawnOptions(env = {}, os = platform()) {
+  return {
+    env: { ...process.env, ...(env || {}) },
+    stdio: ["pipe", "pipe", "pipe"],
+    shell: os === "win32",
+  };
+}
+
 function extractServer(target, config) {
   if (target === "cursor" || target === "claude-desktop") return config?.mcpServers?.qveris;
   if (target === "opencode") return config?.mcp?.qveris;
@@ -526,7 +532,16 @@ function printValidation(payload) {
   console.log(payload.ok ? `\n  ${green("MCP config looks valid.")}\n` : `\n  ${red("MCP config needs attention.")}\n`);
 }
 
-function shellQuote(value) {
+function buildClaudeCodeEnvArgs(env, os) {
+  const envArgs = [`--env QVERIS_API_KEY=${shellQuoteForPlatform(env.QVERIS_API_KEY, os)}`];
+  if (env.QVERIS_BASE_URL) {
+    envArgs.push(`--env QVERIS_BASE_URL=${shellQuoteForPlatform(env.QVERIS_BASE_URL, os)}`);
+  }
+  return envArgs;
+}
+
+export function shellQuoteForPlatform(value, os = platform()) {
+  if (os === "win32") return `"${String(value).replaceAll("\"", "\"\"")}"`;
   return `'${String(value).replaceAll("'", "'\\''")}'`;
 }
 
