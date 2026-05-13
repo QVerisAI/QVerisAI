@@ -266,6 +266,12 @@ This repository (`QVerisAI/qveris-agent-toolkit`) is the primary monorepo for QV
 | Agent docs | [`agent/`](agent) | — |
 | Skills | [`skills/`](skills) | — |
 
+### Recipes and ecosystem manifests
+
+Use [`recipes/`](recipes) for copy-paste workflow templates across finance research, risk/compliance, crypto monitoring, data analysis, and developer automation.
+
+Use [`ecosystem/`](ecosystem) for the versioned QVeris manifest schema, marketplace-ready listing fields, permission declarations, contribution guide, and compatibility matrix.
+
 ### Other repositories
 
 | Repository | Description |

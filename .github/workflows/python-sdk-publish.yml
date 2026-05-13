@@ -1,0 +1,102 @@
+name: Publish Python SDK to PyPI
+
+on:
+  push:
+    tags:
+      - "python-sdk-v*" # Trigger on tags like python-sdk-v0.1.0, python-sdk-v1.0.0
+
+permissions:
+  contents: write # For creating GitHub Releases
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/python-sdk
+
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: packages/python-sdk/uv.lock
+
+      - name: Run tests
+        run: uv run --extra dev pytest
+
+      - name: Compile package and examples
+        run: uv run python -m compileall qveris examples
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/python-sdk
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: packages/python-sdk/uv.lock
+
+      - name: Verify package version matches tag
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#python-sdk-v}"
+          PKG_VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "::error::Tag version ($TAG_VERSION) does not match pyproject.toml version ($PKG_VERSION)"
+            exit 1
+          fi
+          echo "VERSION=$PKG_VERSION" >> "$GITHUB_ENV"
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: packages/python-sdk/dist
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "QVeris Python SDK v${{ env.VERSION }}"
+          body: |
+            ## Install
+
+            ```bash
+            pip install qveris==${{ env.VERSION }}
+            ```
+
+            ## Highlights
+
+            - Publishes the typed Python SDK for the QVeris Agent External Data & Tool Harness.
+            - Includes discover, inspect, call, usage, and ledger client methods.
+            - Includes the built-in agent runtime and OpenAI-compatible provider support.
+
+            See [README](packages/python-sdk/README.md) for usage.
+          generate_release_notes: true

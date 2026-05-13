@@ -1,0 +1,88 @@
+{
+  "$schema": "../../ecosystem/manifest.schema.json",
+  "schema_version": "2026-05-13",
+  "id": "qveris.recipe.data-analysis",
+  "kind": "recipe",
+  "name": "Data Analysis Enrichment",
+  "summary": "Enrich datasets by discovering and calling external data capabilities.",
+  "description": "A copy-paste recipe for using QVeris to discover enrichment APIs, inspect their parameters, run a sample row, and audit usage records.",
+  "version": "0.1.0",
+  "status": "beta",
+  "owner": {
+    "name": "QVeris",
+    "url": "https://qveris.ai"
+  },
+  "tags": ["data-analysis", "enrichment", "datasets", "automation"],
+  "categories": ["analytics", "automation"],
+  "permissions": {
+    "qveris": [
+      {
+        "scope": "capability.discover",
+        "reason": "Find enrichment capabilities for a dataset field or entity.",
+        "required": true
+      },
+      {
+        "scope": "capability.inspect",
+        "reason": "Inspect required enrichment inputs and output metadata before execution.",
+        "required": true
+      },
+      {
+        "scope": "capability.call",
+        "reason": "Execute the selected enrichment capability on a sample record.",
+        "required": true
+      },
+      {
+        "scope": "capability.audit",
+        "reason": "Verify usage and ledger records after enrichment execution.",
+        "required": false
+      }
+    ],
+    "network": [
+      {
+        "host": "qveris.ai",
+        "reason": "Call QVeris API endpoints for discovery, execution, and audit.",
+        "required": true
+      }
+    ],
+    "secrets": [
+      {
+        "scope": "QVERIS_API_KEY",
+        "reason": "Authenticate QVeris API requests.",
+        "required": true
+      }
+    ]
+  },
+  "compatibility": {
+    "cli": ">=0.5.0",
+    "mcp": ">=0.6.0",
+    "python_sdk": ">=0.1.0",
+    "agent_skill": ">=0.1.0"
+  },
+  "marketplace": {
+    "listing_slug": "data-analysis",
+    "headline": "External data enrichment for analysis workflows.",
+    "audience": "Data analysts and agents that need to enrich records with external APIs.",
+    "use_cases": ["Enrich company domains", "Inspect API output structure", "Audit usage for sampled rows"],
+    "integration_methods": ["cli", "python-sdk", "mcp", "skill"],
+    "primary_cta": "Run data recipe",
+    "docs_url": "recipes/data-analysis/README.md"
+  },
+  "docs": {
+    "readme": "README.md",
+    "quickstart": "README.md#quickstart"
+  },
+  "examples": [
+    {
+      "name": "CLI first call",
+      "path": "README.md#cli",
+      "language": "shell",
+      "command": "qveris init --query \"company domain enrichment API\" --params '{\"domain\":\"qveris.ai\"}' --json"
+    },
+    {
+      "name": "Python SDK workflow",
+      "path": "README.md#python-sdk",
+      "language": "python",
+      "command": "python data_analysis.py"
+    }
+  ]
+}

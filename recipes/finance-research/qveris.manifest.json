@@ -1,0 +1,88 @@
+{
+  "$schema": "../../ecosystem/manifest.schema.json",
+  "schema_version": "2026-05-13",
+  "id": "qveris.recipe.finance-research",
+  "kind": "recipe",
+  "name": "Finance Research",
+  "summary": "Discover and call market data capabilities for public company research workflows.",
+  "description": "A copy-paste recipe for finding a stock quote or market data capability, inspecting its parameters, executing it, and auditing the final charge outcome.",
+  "version": "0.1.0",
+  "status": "beta",
+  "owner": {
+    "name": "QVeris",
+    "url": "https://qveris.ai"
+  },
+  "tags": ["finance", "market-data", "stocks", "research"],
+  "categories": ["finance", "analytics"],
+  "permissions": {
+    "qveris": [
+      {
+        "scope": "capability.discover",
+        "reason": "Find public company market data capabilities by natural-language intent.",
+        "required": true
+      },
+      {
+        "scope": "capability.inspect",
+        "reason": "Read parameter, billing, quality, and example metadata before execution.",
+        "required": true
+      },
+      {
+        "scope": "capability.call",
+        "reason": "Execute the selected market data capability with a stock symbol.",
+        "required": true
+      },
+      {
+        "scope": "capability.audit",
+        "reason": "Verify usage and ledger records after execution.",
+        "required": false
+      }
+    ],
+    "network": [
+      {
+        "host": "qveris.ai",
+        "reason": "Call QVeris API endpoints for discovery, execution, and audit.",
+        "required": true
+      }
+    ],
+    "secrets": [
+      {
+        "scope": "QVERIS_API_KEY",
+        "reason": "Authenticate QVeris API requests.",
+        "required": true
+      }
+    ]
+  },
+  "compatibility": {
+    "cli": ">=0.5.0",
+    "mcp": ">=0.6.0",
+    "python_sdk": ">=0.1.0",
+    "agent_skill": ">=0.1.0"
+  },
+  "marketplace": {
+    "listing_slug": "finance-research",
+    "headline": "Market data discovery and execution for public company research.",
+    "audience": "Analysts and agents that need quick access to stock quote or market data APIs.",
+    "use_cases": ["Fetch current quote data", "Compare candidate market data providers", "Audit final credit charges"],
+    "integration_methods": ["cli", "python-sdk", "mcp", "skill"],
+    "primary_cta": "Run finance recipe",
+    "docs_url": "recipes/finance-research/README.md"
+  },
+  "docs": {
+    "readme": "README.md",
+    "quickstart": "README.md#quickstart"
+  },
+  "examples": [
+    {
+      "name": "CLI first call",
+      "path": "README.md#cli",
+      "language": "shell",
+      "command": "qveris init --query \"public company stock quote and market data API\" --params '{\"symbol\":\"AAPL\"}' --json"
+    },
+    {
+      "name": "Python SDK workflow",
+      "path": "README.md#python-sdk",
+      "language": "python",
+      "command": "python finance_research.py"
+    }
+  ]
+}
