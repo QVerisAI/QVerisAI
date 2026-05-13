@@ -19,6 +19,7 @@ const VALID_CATEGORIES = new Set([
   "compliance",
 ]);
 const VALID_METHODS = new Set(["cli", "mcp", "python-sdk", "rest-api", "skill", "plugin"]);
+const VALID_EXAMPLE_LANGUAGES = new Set(["shell", "python", "typescript", "json", "markdown"]);
 const REQUIRED_RECIPE_SCOPES = ["capability.discover", "capability.inspect"];
 
 const args = process.argv.slice(2);
@@ -94,9 +95,9 @@ function validateManifest(manifestPath) {
   requiredString(errors, manifest, "schema_version");
   requiredString(errors, manifest, "id");
   requiredString(errors, manifest, "kind");
-  requiredString(errors, manifest, "name");
-  requiredString(errors, manifest, "summary");
-  requiredString(errors, manifest, "description");
+  requiredString(errors, manifest, "name", { minLength: 3 });
+  requiredString(errors, manifest, "summary", { minLength: 20, maxLength: 160 });
+  requiredString(errors, manifest, "description", { minLength: 40 });
   requiredString(errors, manifest, "version");
   requiredString(errors, manifest, "status");
 
@@ -114,8 +115,6 @@ function validateManifest(manifestPath) {
     errors.push("version must be semver");
   }
   if (!VALID_STATUS.has(manifest.status)) errors.push("status must be experimental, beta, or stable");
-  if ((manifest.summary || "").length > 160) errors.push("summary must be 160 characters or less");
-
   validateOwner(errors, manifest.owner);
   validateStringArray(errors, manifest.tags, "tags", { min: 2, pattern: /^[a-z0-9][a-z0-9-]*$/ });
   validateStringArray(errors, manifest.categories, "categories", { min: 1, allowed: VALID_CATEGORIES });
@@ -133,7 +132,7 @@ function validateOwner(errors, owner) {
     errors.push("owner is required");
     return;
   }
-  requiredString(errors, owner, "owner.name");
+  requiredString(errors, owner, "owner.name", { minLength: 2 });
   requiredString(errors, owner, "owner.url");
   if (owner.url && !/^https?:\/\//.test(owner.url)) errors.push("owner.url must be an absolute HTTP URL");
 }
@@ -167,9 +166,15 @@ function validatePermissions(errors, permissions, kind) {
       permissions.network.forEach((permission, index) => {
         if (!permission?.host || typeof permission.host !== "string") {
           errors.push(`permissions.network[${index}].host is required`);
+        } else {
+          validateStringLength(errors, permission.host, `permissions.network[${index}].host`, { minLength: 3 });
         }
         if (!permission?.reason || typeof permission.reason !== "string") {
           errors.push(`permissions.network[${index}].reason is required`);
+        } else {
+          validateStringLength(errors, permission.reason, `permissions.network[${index}].reason`, {
+            minLength: 12,
+          });
         }
         if (typeof permission?.required !== "boolean") {
           errors.push(`permissions.network[${index}].required must be boolean`);
@@ -190,8 +195,16 @@ function validatePermission(errors, permission, prefix) {
     errors.push(`${prefix} must be an object`);
     return;
   }
-  if (!permission.scope || typeof permission.scope !== "string") errors.push(`${prefix}.scope is required`);
-  if (!permission.reason || typeof permission.reason !== "string") errors.push(`${prefix}.reason is required`);
+  if (!permission.scope || typeof permission.scope !== "string") {
+    errors.push(`${prefix}.scope is required`);
+  } else {
+    validateStringLength(errors, permission.scope, `${prefix}.scope`, { minLength: 3 });
+  }
+  if (!permission.reason || typeof permission.reason !== "string") {
+    errors.push(`${prefix}.reason is required`);
+  } else {
+    validateStringLength(errors, permission.reason, `${prefix}.reason`, { minLength: 12 });
+  }
   if (typeof permission.required !== "boolean") errors.push(`${prefix}.required must be boolean`);
 }
 
@@ -212,13 +225,14 @@ function validateMarketplace(errors, marketplace) {
     return;
   }
   requiredString(errors, marketplace, "marketplace.listing_slug");
-  requiredString(errors, marketplace, "marketplace.headline");
-  requiredString(errors, marketplace, "marketplace.audience");
-  requiredString(errors, marketplace, "marketplace.primary_cta");
+  requiredString(errors, marketplace, "marketplace.headline", { minLength: 12, maxLength: 120 });
+  requiredString(errors, marketplace, "marketplace.audience", { minLength: 10 });
+  requiredString(errors, marketplace, "marketplace.primary_cta", { minLength: 3 });
+  optionalString(errors, marketplace, "marketplace.docs_url");
   if (marketplace.listing_slug && !/^[a-z0-9][a-z0-9-]*$/.test(marketplace.listing_slug)) {
     errors.push("marketplace.listing_slug must be kebab-case");
   }
-  validateStringArray(errors, marketplace.use_cases, "marketplace.use_cases", { min: 2 });
+  validateStringArray(errors, marketplace.use_cases, "marketplace.use_cases", { min: 2, itemMinLength: 8 });
   validateStringArray(errors, marketplace.integration_methods, "marketplace.integration_methods", {
     min: 1,
     allowed: VALID_METHODS,
@@ -233,6 +247,10 @@ function validateDocs(errors, docs, baseDir) {
   requiredString(errors, docs, "docs.readme");
   for (const [key, value] of Object.entries(docs)) {
     if (!value) continue;
+    if (typeof value !== "string") {
+      errors.push(`docs.${key} must be a string`);
+      continue;
+    }
     const localPath = stripAnchor(value);
     if (!fs.existsSync(path.resolve(baseDir, localPath))) {
       errors.push(`docs.${key} path does not exist: ${value}`);
@@ -249,7 +267,11 @@ function validateExamples(errors, examples, baseDir) {
     requiredString(errors, example, `examples[${index}].name`);
     requiredString(errors, example, `examples[${index}].path`);
     requiredString(errors, example, `examples[${index}].language`);
-    requiredString(errors, example, `examples[${index}].command`);
+    requiredString(errors, example, `examples[${index}].command`, { minLength: 5 });
+    if (example.name) validateStringLength(errors, example.name, `examples[${index}].name`, { minLength: 3 });
+    if (example.language && !VALID_EXAMPLE_LANGUAGES.has(example.language)) {
+      errors.push(`examples[${index}].language has unsupported value: ${example.language}`);
+    }
     if (example.path && !fs.existsSync(path.resolve(baseDir, stripAnchor(example.path)))) {
       errors.push(`examples[${index}].path does not exist: ${example.path}`);
     }
@@ -270,16 +292,44 @@ function validateStringArray(errors, value, label, options = {}) {
     }
     if (seen.has(item)) errors.push(`${label} contains duplicate value: ${item}`);
     seen.add(item);
+    if (options.itemMinLength && item.length < options.itemMinLength) {
+      errors.push(`${label} values must be at least ${options.itemMinLength} characters`);
+    }
     if (options.pattern && !options.pattern.test(item)) errors.push(`${label} has invalid value: ${item}`);
     if (options.allowed && !options.allowed.has(item)) errors.push(`${label} has unsupported value: ${item}`);
   }
 }
 
-function requiredString(errors, object, key) {
+function requiredString(errors, object, key, options = {}) {
   const parts = key.split(".");
   const prop = parts.at(-1);
   const value = object?.[prop];
-  if (!value || typeof value !== "string") errors.push(`${key} is required`);
+  if (!value || typeof value !== "string") {
+    errors.push(`${key} is required`);
+    return;
+  }
+  validateStringLength(errors, value, key, options);
+}
+
+function optionalString(errors, object, key, options = {}) {
+  const parts = key.split(".");
+  const prop = parts.at(-1);
+  const value = object?.[prop];
+  if (value === undefined) return;
+  if (typeof value !== "string") {
+    errors.push(`${key} must be a string`);
+    return;
+  }
+  validateStringLength(errors, value, key, options);
+}
+
+function validateStringLength(errors, value, key, options = {}) {
+  if (options.minLength !== undefined && value.length < options.minLength) {
+    errors.push(`${key} must be at least ${options.minLength} characters`);
+  }
+  if (options.maxLength !== undefined && value.length > options.maxLength) {
+    errors.push(`${key} must be ${options.maxLength} characters or less`);
+  }
 }
 
 function stripAnchor(filePath) {

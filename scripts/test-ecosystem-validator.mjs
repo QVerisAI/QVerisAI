@@ -16,6 +16,9 @@ const tests = [
   ["rejects missing required recipe permission", testMissingInspectPermission],
   ["rejects missing docs path", testMissingDocsPath],
   ["rejects invalid marketplace integration method", testInvalidIntegrationMethod],
+  ["rejects invalid marketplace docs url type", testInvalidMarketplaceDocsUrlType],
+  ["rejects schema string length violations", testStringLengthViolations],
+  ["rejects schema string max length violations", testStringMaxLengthViolations],
   ["rejects unsupported schema version", testUnsupportedSchemaVersion],
   ["rejects missing example path", testMissingExamplePath],
 ];
@@ -64,6 +67,63 @@ function testInvalidIntegrationMethod() {
   const result = runValidator(manifestPath);
   assertEqualStatus(result, 1);
   assert.match(result.stderr, /marketplace\.integration_methods has unsupported value: spreadsheet/);
+}
+
+function testInvalidMarketplaceDocsUrlType() {
+  const manifestPath = writeFixture("invalid-docs-url", (manifest) => {
+    manifest.marketplace.docs_url = 42;
+  });
+  const result = runValidator(manifestPath);
+  assertEqualStatus(result, 1);
+  assert.match(result.stderr, /marketplace\.docs_url must be a string/);
+}
+
+function testStringLengthViolations() {
+  const manifestPath = writeFixture("short-strings", (manifest) => {
+    manifest.name = "No";
+    manifest.summary = "Too short";
+    manifest.description = "Too short";
+    manifest.owner.name = "Q";
+    manifest.permissions.qveris[0].reason = "Too short";
+    manifest.permissions.network[0].host = "qa";
+    manifest.permissions.network[0].reason = "Too short";
+    manifest.permissions.secrets[0].scope = "SK";
+    manifest.permissions.secrets[0].reason = "Too short";
+    manifest.marketplace.headline = "Too short";
+    manifest.marketplace.audience = "Too short";
+    manifest.marketplace.use_cases = ["Short", "Also"];
+    manifest.marketplace.primary_cta = "Go";
+    manifest.examples[0].name = "Ex";
+    manifest.examples[0].command = "run";
+  });
+  const result = runValidator(manifestPath);
+  assertEqualStatus(result, 1);
+  assert.match(result.stderr, /name must be at least 3 characters/);
+  assert.match(result.stderr, /summary must be at least 20 characters/);
+  assert.match(result.stderr, /description must be at least 40 characters/);
+  assert.match(result.stderr, /owner\.name must be at least 2 characters/);
+  assert.match(result.stderr, /permissions\.qveris\[0\]\.reason must be at least 12 characters/);
+  assert.match(result.stderr, /permissions\.network\[0\]\.host must be at least 3 characters/);
+  assert.match(result.stderr, /permissions\.network\[0\]\.reason must be at least 12 characters/);
+  assert.match(result.stderr, /permissions\.secrets\[0\]\.scope must be at least 3 characters/);
+  assert.match(result.stderr, /permissions\.secrets\[0\]\.reason must be at least 12 characters/);
+  assert.match(result.stderr, /marketplace\.headline must be at least 12 characters/);
+  assert.match(result.stderr, /marketplace\.audience must be at least 10 characters/);
+  assert.match(result.stderr, /marketplace\.use_cases values must be at least 8 characters/);
+  assert.match(result.stderr, /marketplace\.primary_cta must be at least 3 characters/);
+  assert.match(result.stderr, /examples\[0\]\.name must be at least 3 characters/);
+  assert.match(result.stderr, /examples\[0\]\.command must be at least 5 characters/);
+}
+
+function testStringMaxLengthViolations() {
+  const manifestPath = writeFixture("long-strings", (manifest) => {
+    manifest.summary = "A".repeat(161);
+    manifest.marketplace.headline = "B".repeat(121);
+  });
+  const result = runValidator(manifestPath);
+  assertEqualStatus(result, 1);
+  assert.match(result.stderr, /summary must be 160 characters or less/);
+  assert.match(result.stderr, /marketplace\.headline must be 120 characters or less/);
 }
 
 function testUnsupportedSchemaVersion() {
