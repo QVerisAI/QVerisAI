@@ -1,0 +1,41 @@
+name: Validate ecosystem manifests
+
+on:
+  pull_request:
+    paths:
+      - "ecosystem/**"
+      - "recipes/**"
+      - "scripts/validate-ecosystem-manifests.mjs"
+      - "scripts/test-ecosystem-validator.mjs"
+      - ".github/workflows/ecosystem-validate.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "ecosystem/**"
+      - "recipes/**"
+      - "scripts/validate-ecosystem-manifests.mjs"
+      - "scripts/test-ecosystem-validator.mjs"
+      - ".github/workflows/ecosystem-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate manifests
+        run: node scripts/validate-ecosystem-manifests.mjs
+
+      - name: Test manifest validator
+        run: node scripts/test-ecosystem-validator.mjs

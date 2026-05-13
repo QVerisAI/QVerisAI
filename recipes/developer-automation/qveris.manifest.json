@@ -1,0 +1,88 @@
+{
+  "$schema": "../../ecosystem/manifest.schema.json",
+  "schema_version": "2026-05-13",
+  "id": "qveris.recipe.developer-automation",
+  "kind": "recipe",
+  "name": "Developer Automation",
+  "summary": "Discover and call developer-facing APIs for repository and package automation.",
+  "description": "A copy-paste recipe for finding developer automation capabilities, inspecting required repository or package parameters, executing a candidate, and auditing usage.",
+  "version": "0.1.0",
+  "status": "beta",
+  "owner": {
+    "name": "QVeris",
+    "url": "https://qveris.ai"
+  },
+  "tags": ["developer-tools", "automation", "repositories", "packages"],
+  "categories": ["developer-tools", "automation"],
+  "permissions": {
+    "qveris": [
+      {
+        "scope": "capability.discover",
+        "reason": "Find developer automation APIs by natural-language intent.",
+        "required": true
+      },
+      {
+        "scope": "capability.inspect",
+        "reason": "Inspect required repository or package parameters before execution.",
+        "required": true
+      },
+      {
+        "scope": "capability.call",
+        "reason": "Execute the selected developer automation capability with repository inputs.",
+        "required": true
+      },
+      {
+        "scope": "capability.audit",
+        "reason": "Verify usage and ledger records after execution.",
+        "required": false
+      }
+    ],
+    "network": [
+      {
+        "host": "qveris.ai",
+        "reason": "Call QVeris API endpoints for discovery, execution, and audit.",
+        "required": true
+      }
+    ],
+    "secrets": [
+      {
+        "scope": "QVERIS_API_KEY",
+        "reason": "Authenticate QVeris API requests.",
+        "required": true
+      }
+    ]
+  },
+  "compatibility": {
+    "cli": ">=0.5.0",
+    "mcp": ">=0.6.0",
+    "python_sdk": ">=0.1.0",
+    "agent_skill": ">=0.1.0"
+  },
+  "marketplace": {
+    "listing_slug": "developer-automation",
+    "headline": "External developer API discovery for automation workflows.",
+    "audience": "Developers and agents that need repository, issue, package, or API metadata.",
+    "use_cases": ["Lookup repository metadata", "Inspect package or release data", "Audit execution charges"],
+    "integration_methods": ["cli", "python-sdk", "mcp", "skill"],
+    "primary_cta": "Run developer recipe",
+    "docs_url": "recipes/developer-automation/README.md"
+  },
+  "docs": {
+    "readme": "README.md",
+    "quickstart": "README.md#quickstart"
+  },
+  "examples": [
+    {
+      "name": "CLI first call",
+      "path": "README.md#cli",
+      "language": "shell",
+      "command": "qveris init --query \"GitHub repository metadata API\" --params '{\"owner\":\"QVerisAI\",\"repo\":\"qveris-agent-toolkit\"}' --json"
+    },
+    {
+      "name": "Python SDK workflow",
+      "path": "README.md#python-sdk",
+      "language": "python",
+      "command": "python developer_automation.py"
+    }
+  ]
+}

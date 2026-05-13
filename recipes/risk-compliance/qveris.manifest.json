@@ -1,0 +1,88 @@
+{
+  "$schema": "../../ecosystem/manifest.schema.json",
+  "schema_version": "2026-05-13",
+  "id": "qveris.recipe.risk-compliance",
+  "kind": "recipe",
+  "name": "Risk And Compliance Screening",
+  "summary": "Find and call compliance screening capabilities for entity risk checks.",
+  "description": "A copy-paste recipe for discovering sanctions, adverse media, or entity screening capabilities, executing a candidate, and auditing charge outcome.",
+  "version": "0.1.0",
+  "status": "beta",
+  "owner": {
+    "name": "QVeris",
+    "url": "https://qveris.ai"
+  },
+  "tags": ["risk", "compliance", "sanctions", "screening"],
+  "categories": ["risk", "compliance"],
+  "permissions": {
+    "qveris": [
+      {
+        "scope": "capability.discover",
+        "reason": "Find compliance screening capabilities by natural-language intent.",
+        "required": true
+      },
+      {
+        "scope": "capability.inspect",
+        "reason": "Inspect required identity fields, examples, billing, and quality metadata.",
+        "required": true
+      },
+      {
+        "scope": "capability.call",
+        "reason": "Execute the selected compliance screening capability with entity details.",
+        "required": true
+      },
+      {
+        "scope": "capability.audit",
+        "reason": "Verify usage and ledger records after screening execution.",
+        "required": false
+      }
+    ],
+    "network": [
+      {
+        "host": "qveris.ai",
+        "reason": "Call QVeris API endpoints for discovery, execution, and audit.",
+        "required": true
+      }
+    ],
+    "secrets": [
+      {
+        "scope": "QVERIS_API_KEY",
+        "reason": "Authenticate QVeris API requests.",
+        "required": true
+      }
+    ]
+  },
+  "compatibility": {
+    "cli": ">=0.5.0",
+    "mcp": ">=0.6.0",
+    "python_sdk": ">=0.1.0",
+    "agent_skill": ">=0.1.0"
+  },
+  "marketplace": {
+    "listing_slug": "risk-compliance",
+    "headline": "Compliance capability discovery for entity risk checks.",
+    "audience": "Risk teams and agents that need sanctions, adverse media, or entity screening APIs.",
+    "use_cases": ["Screen an organization name", "Inspect required compliance parameters", "Audit final charge outcome"],
+    "integration_methods": ["cli", "python-sdk", "mcp", "skill"],
+    "primary_cta": "Run compliance recipe",
+    "docs_url": "recipes/risk-compliance/README.md"
+  },
+  "docs": {
+    "readme": "README.md",
+    "quickstart": "README.md#quickstart"
+  },
+  "examples": [
+    {
+      "name": "CLI first call",
+      "path": "README.md#cli",
+      "language": "shell",
+      "command": "qveris init --query \"sanctions screening or adverse media compliance API\" --params '{\"name\":\"Acme Trading Ltd\"}' --json"
+    },
+    {
+      "name": "Python SDK workflow",
+      "path": "README.md#python-sdk",
+      "language": "python",
+      "command": "python risk_compliance.py"
+    }
+  ]
+}

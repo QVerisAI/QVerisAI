@@ -1,0 +1,88 @@
+{
+  "$schema": "../../ecosystem/manifest.schema.json",
+  "schema_version": "2026-05-13",
+  "id": "qveris.recipe.crypto-monitoring",
+  "kind": "recipe",
+  "name": "Crypto Monitoring",
+  "summary": "Discover token price and crypto market data capabilities for monitoring workflows.",
+  "description": "A copy-paste recipe for finding cryptocurrency price and market data capabilities, calling a selected provider, and checking final usage records.",
+  "version": "0.1.0",
+  "status": "beta",
+  "owner": {
+    "name": "QVeris",
+    "url": "https://qveris.ai"
+  },
+  "tags": ["crypto", "market-data", "monitoring", "tokens"],
+  "categories": ["crypto", "analytics"],
+  "permissions": {
+    "qveris": [
+      {
+        "scope": "capability.discover",
+        "reason": "Find cryptocurrency market data capabilities by natural-language intent.",
+        "required": true
+      },
+      {
+        "scope": "capability.inspect",
+        "reason": "Read required token, currency, billing, and quality metadata before execution.",
+        "required": true
+      },
+      {
+        "scope": "capability.call",
+        "reason": "Execute the selected crypto market data capability with token parameters.",
+        "required": true
+      },
+      {
+        "scope": "capability.audit",
+        "reason": "Verify usage and ledger records after execution.",
+        "required": false
+      }
+    ],
+    "network": [
+      {
+        "host": "qveris.ai",
+        "reason": "Call QVeris API endpoints for discovery, execution, and audit.",
+        "required": true
+      }
+    ],
+    "secrets": [
+      {
+        "scope": "QVERIS_API_KEY",
+        "reason": "Authenticate QVeris API requests.",
+        "required": true
+      }
+    ]
+  },
+  "compatibility": {
+    "cli": ">=0.5.0",
+    "mcp": ">=0.6.0",
+    "python_sdk": ">=0.1.0",
+    "agent_skill": ">=0.1.0"
+  },
+  "marketplace": {
+    "listing_slug": "crypto-monitoring",
+    "headline": "Crypto market data discovery for token monitoring.",
+    "audience": "Agents and developers that need token price or crypto market data APIs.",
+    "use_cases": ["Fetch BTC market data", "Compare crypto data providers", "Audit execution charges"],
+    "integration_methods": ["cli", "python-sdk", "mcp", "skill"],
+    "primary_cta": "Run crypto recipe",
+    "docs_url": "recipes/crypto-monitoring/README.md"
+  },
+  "docs": {
+    "readme": "README.md",
+    "quickstart": "README.md#quickstart"
+  },
+  "examples": [
+    {
+      "name": "CLI first call",
+      "path": "README.md#cli",
+      "language": "shell",
+      "command": "qveris init --query \"cryptocurrency market price and volume API\" --params '{\"symbol\":\"BTC\",\"currency\":\"USD\"}' --json"
+    },
+    {
+      "name": "Python SDK workflow",
+      "path": "README.md#python-sdk",
+      "language": "python",
+      "command": "python crypto_monitoring.py"
+    }
+  ]
+}

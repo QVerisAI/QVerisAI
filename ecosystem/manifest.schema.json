@@ -1,0 +1,284 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qveris.ai/schemas/ecosystem-manifest-2026-05-13.json",
+  "title": "QVeris Ecosystem Manifest",
+  "description": "Versioned manifest for QVeris recipes, skills, plugins, and marketplace-ready listings.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "kind",
+    "name",
+    "summary",
+    "description",
+    "version",
+    "status",
+    "owner",
+    "tags",
+    "categories",
+    "permissions",
+    "compatibility",
+    "marketplace",
+    "docs",
+    "examples"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "2026-05-13"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^qveris\\.(recipe|skill|plugin)\\.[a-z0-9][a-z0-9-]*(\\.[a-z0-9][a-z0-9-]*)*$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["recipe", "skill", "plugin"]
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 160
+    },
+    "description": {
+      "type": "string",
+      "minLength": 40
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["experimental", "beta", "stable"]
+    },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "url"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 2
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      },
+      "uniqueItems": true
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["finance", "risk", "crypto", "analytics", "developer-tools", "automation", "compliance"]
+      },
+      "uniqueItems": true
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["qveris"],
+      "properties": {
+        "qveris": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/permission"
+          }
+        },
+        "network": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/network_permission"
+          }
+        },
+        "local_files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/permission"
+          }
+        },
+        "secrets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/permission"
+          }
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minProperties": 1,
+      "properties": {
+        "cli": {
+          "type": "string"
+        },
+        "mcp": {
+          "type": "string"
+        },
+        "python_sdk": {
+          "type": "string"
+        },
+        "agent_skill": {
+          "type": "string"
+        }
+      }
+    },
+    "marketplace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "listing_slug",
+        "headline",
+        "audience",
+        "use_cases",
+        "integration_methods",
+        "primary_cta"
+      ],
+      "properties": {
+        "listing_slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "headline": {
+          "type": "string",
+          "minLength": 12,
+          "maxLength": 120
+        },
+        "audience": {
+          "type": "string",
+          "minLength": 10
+        },
+        "use_cases": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 8
+          }
+        },
+        "integration_methods": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["cli", "mcp", "python-sdk", "rest-api", "skill", "plugin"]
+          },
+          "uniqueItems": true
+        },
+        "primary_cta": {
+          "type": "string",
+          "minLength": 3
+        },
+        "docs_url": {
+          "type": "string"
+        }
+      }
+    },
+    "docs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["readme"],
+      "properties": {
+        "readme": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quickstart": {
+          "type": "string"
+        },
+        "configuration": {
+          "type": "string"
+        }
+      }
+    },
+    "examples": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "path", "language", "command"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "language": {
+            "type": "string",
+            "enum": ["shell", "python", "typescript", "json", "markdown"]
+          },
+          "command": {
+            "type": "string",
+            "minLength": 5
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "permission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "reason", "required"],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "minLength": 3
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 12
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "network_permission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host", "reason", "required"],
+      "properties": {
+        "host": {
+          "type": "string",
+          "minLength": 3
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 12
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "../manifest.schema.json",
+  "schema_version": "2026-05-13",
+  "id": "qveris.plugin.replace-with-plugin-slug",
+  "kind": "plugin",
+  "name": "Replace With Plugin Name",
+  "summary": "Replace with a concise plugin summary for developers and marketplace listings.",
+  "description": "Replace with a complete description of the plugin, the integration surface it adds, and the expected runtime requirements.",
+  "version": "0.1.0",
+  "status": "experimental",
+  "owner": {
+    "name": "Your Team",
+    "url": "https://example.com"
+  },
+  "tags": ["replace-me", "qveris"],
+  "categories": ["developer-tools"],
+  "permissions": {
+    "qveris": [
+      {
+        "scope": "capability.discover",
+        "reason": "Find relevant external capabilities for this plugin workflow.",
+        "required": true
+      }
+    ],
+    "network": [
+      {
+        "host": "qveris.ai",
+        "reason": "Use QVeris APIs for capability discovery and execution.",
+        "required": true
+      }
+    ]
+  },
+  "compatibility": {
+    "cli": ">=0.5.0",
+    "python_sdk": ">=0.1.0"
+  },
+  "marketplace": {
+    "listing_slug": "replace-with-plugin-slug",
+    "headline": "Replace with a marketplace-ready headline.",
+    "audience": "Developers and agents who need this integration.",
+    "use_cases": ["Replace with use case one", "Replace with use case two"],
+    "integration_methods": ["plugin", "cli", "python-sdk"],
+    "primary_cta": "Install plugin"
+  },
+  "docs": {
+    "readme": "README.md"
+  },
+  "examples": [
+    {
+      "name": "CLI smoke test",
+      "path": "README.md",
+      "language": "shell",
+      "command": "qveris discover \"replace with capability query\" --limit 3"
+    }
+  ]
+}

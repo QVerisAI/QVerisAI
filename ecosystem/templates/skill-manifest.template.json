@@ -1,0 +1,56 @@
+{
+  "$schema": "../manifest.schema.json",
+  "schema_version": "2026-05-13",
+  "id": "qveris.skill.replace-with-skill-slug",
+  "kind": "skill",
+  "name": "Replace With Skill Name",
+  "summary": "Replace with a concise skill summary for agents and marketplace listings.",
+  "description": "Replace with a complete description of the skill, what it helps agents do, and when it should be used.",
+  "version": "0.1.0",
+  "status": "experimental",
+  "owner": {
+    "name": "Your Team",
+    "url": "https://example.com"
+  },
+  "tags": ["replace-me", "qveris"],
+  "categories": ["automation"],
+  "permissions": {
+    "qveris": [
+      {
+        "scope": "capability.discover",
+        "reason": "Find relevant external capabilities for this skill workflow.",
+        "required": true
+      }
+    ],
+    "network": [
+      {
+        "host": "qveris.ai",
+        "reason": "Use QVeris APIs for capability discovery and execution.",
+        "required": true
+      }
+    ]
+  },
+  "compatibility": {
+    "agent_skill": ">=0.1.0",
+    "mcp": ">=0.6.0"
+  },
+  "marketplace": {
+    "listing_slug": "replace-with-skill-slug",
+    "headline": "Replace with a marketplace-ready headline.",
+    "audience": "Agents and developers who need this workflow.",
+    "use_cases": ["Replace with use case one", "Replace with use case two"],
+    "integration_methods": ["skill", "mcp"],
+    "primary_cta": "Install skill"
+  },
+  "docs": {
+    "readme": "README.md"
+  },
+  "examples": [
+    {
+      "name": "Agent prompt",
+      "path": "README.md",
+      "language": "markdown",
+      "command": "Use this skill to discover and inspect a capability for <task>."
+    }
+  ]
+}
